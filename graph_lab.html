@@ -5,31 +5,39 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#1a1c2c">
+<link rel="manifest" href="/manifest.webmanifest">
 <title>Graph Theory Lab</title>
+<link rel="icon" type="image/png" href="web.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400;700&family=Mitr:wght@400;500&display=swap" rel="stylesheet">
 <style>
 :root{
   --ink:#1a1c2c; --paper:#f4efe1; --navy:#333c57; --yellow:#ffcd75; --green:#a7f070; --dgreen:#38b764;
   --blue:#41a6f6; --dblue:#3b5dc9; --orange:#ef7d57; --red:#b13e53; --purple:#5d275d; --gray:#94b0c2; --cyan:#73eff7;
-  --font:'Pixelify Sans','Mitr','Tahoma',sans-serif;
+  --font:'Mitr','Tahoma',sans-serif;
 }
 *{box-sizing:border-box}
 html,body{margin:0;height:100%;overflow:hidden;background:var(--navy);font-family:var(--font);color:var(--ink);
   -webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent;touch-action:manipulation;-webkit-text-size-adjust:100%}
 #app{display:flex;flex-direction:column;height:100%;height:100dvh;
   padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)}
-header{background:var(--ink);border-bottom:4px solid #000;flex:0 0 auto}
-.titlebar{display:flex;align-items:baseline;gap:10px;padding:8px 12px 0}
-.logo{color:var(--yellow);font-weight:700;font-size:19px;letter-spacing:1px;text-shadow:2px 2px 0 var(--red);white-space:nowrap}
-.sub{color:var(--gray);font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.scroll{display:flex;gap:8px;overflow-x:auto;overflow-y:hidden;scrollbar-width:none;-ms-overflow-style:none;-webkit-overflow-scrolling:touch;padding:8px 10px 11px}
+header{position:relative;isolation:isolate;padding-top:46px;background:var(--ink);border-bottom:4px solid #000;flex:0 0 auto}
+header::before{content:"";position:absolute;z-index:-1;inset:0;height:46px;background:url('head.png') center center/cover no-repeat;image-rendering:pixelated;pointer-events:none}
+.titlebar{position:absolute;inset:0 0 auto;z-index:1;height:46px;display:flex;align-items:center;gap:10px;padding:4px 12px}
+.logo{position:relative;display:inline-flex;align-items:center;color:#ffb52e;background:linear-gradient(180deg,#9b5b27 0 20%,#633518 20% 100%);border:3px solid #241b20;border-radius:6px;padding:1px 9px 1px 32px;font-family:'Pixelify Sans','Mitr',sans-serif;font-weight:700;font-size:19px;letter-spacing:1px;text-shadow:2px 2px 0 var(--red),-1px -1px 0 #ffd783;white-space:nowrap;box-shadow:0 0 0 2px #8e5a27,3px 4px 0 #000,inset 0 2px 0 #ffd783}
+.logo::before{content:"";position:absolute;inset:-4px;border:1px solid #63c74d;border-radius:8px;pointer-events:none}
+.logo-cat{position:absolute;left:-6px;top:-9px;width:30px;height:30px;display:grid;place-items:center;font:20px/1 'Mitr','Tahoma',sans-serif;filter:drop-shadow(2px 2px 0 #000);z-index:2}
+.sub{color:#241b20;background:#ffcd75;border:2px solid #281b1b;border-radius:3px;padding:0 6px;font-size:12px;font-weight:500;box-shadow:2px 3px 0 #000;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.scroll{position:relative;z-index:1;display:flex;gap:8px;overflow-x:auto;overflow-y:hidden;scrollbar-width:none;-ms-overflow-style:none;-webkit-overflow-scrolling:touch;padding:8px 10px 11px;background:#604025;border-top:3px solid #b17836}
 .scroll::-webkit-scrollbar{display:none}
 .sep{flex:0 0 3px;background:#566c86;margin:4px 2px}
-.btn{font-family:var(--font);font-size:15px;min-height:44px;min-width:44px;padding:6px 12px;background:#fff;color:var(--ink);
-  border:3px solid var(--ink);box-shadow:3px 3px 0 #000;cursor:pointer;white-space:nowrap;display:inline-flex;align-items:center;
-  justify-content:center;gap:6px;border-radius:0;text-decoration:none;flex:0 0 auto}
-.btn:active{transform:translate(3px,3px);box-shadow:none}
+.btn{font-family:var(--font);font-size:15px;min-height:44px;min-width:44px;padding:6px 12px;background:#f4dfb5;color:var(--ink);
+  border:3px solid #30201b;box-shadow:inset 2px 2px 0 rgba(255,255,255,.72),inset -2px -2px 0 rgba(111,75,43,.26),4px 4px 0 #000;
+  cursor:pointer;white-space:nowrap;display:inline-flex;align-items:center;justify-content:center;gap:6px;border-radius:5px;text-decoration:none;
+  flex:0 0 auto;transition:transform .08s steps(2,end),box-shadow .08s steps(2,end)}
+.btn:hover:not(:disabled){transform:translate(-1px,-1px);box-shadow:inset 2px 2px 0 rgba(255,255,255,.72),inset -2px -2px 0 rgba(111,75,43,.26),5px 5px 0 #000}
+.btn:active:not(:disabled){transform:translate(4px,4px);box-shadow:inset 2px 2px 0 rgba(255,255,255,.72),inset -2px -2px 0 rgba(111,75,43,.26),0 0 0 #000}
+.btn:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
 .btn:disabled{opacity:.55;cursor:not-allowed}
 .btn.on{background:var(--yellow)}
 .btn.primary{background:var(--green)}
@@ -37,17 +45,44 @@ header{background:var(--ink);border-bottom:4px solid #000;flex:0 0 auto}
 .btn.mini{min-height:34px;font-size:13px;padding:2px 8px}
 .tbtn{flex-direction:column;gap:0;font-size:12px;min-width:66px;padding:3px 8px;line-height:1.2}
 .tbtn .ic{font-size:20px;line-height:1.15}
+@media (min-width:1400px){
+  #toolbar::after{content:"";align-self:center;flex:0 0 62px;height:58px;margin-left:auto;background:url('mascot_clean.png') center/contain no-repeat;filter:drop-shadow(2px 2px 0 #241b20);pointer-events:none}
+}
 #hint{background:var(--yellow);border-bottom:3px solid var(--ink);padding:6px 12px;font-size:14px;line-height:1.35;flex:0 0 auto}
+#toolStatus{background:#fff9e8;border-bottom:2px solid #6b4727;padding:3px 12px;font-size:12px;line-height:1.3;flex:0 0 auto}
+#quickTools{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:6px;margin:8px 0}
+#quickTools input{min-width:0;width:100%;font:13px var(--font);padding:6px;border:2px solid var(--ink);background:#fff}
+#quickTools .btn{font-size:12px;min-height:36px;padding:3px 6px}
 main{flex:1;display:flex;flex-direction:column;min-height:0}
-#stage{flex:1;position:relative;min-height:150px;overflow:hidden;background:var(--paper)}
+#stage{flex:1;position:relative;min-height:150px;overflow:hidden;background:var(--paper);border:5px solid #6b4727;box-shadow:inset 0 0 0 2px #d3a45c}
 #cv{position:absolute;inset:0;touch-action:none;display:block;cursor:crosshair}
+#isoRightPane{display:none;position:absolute;left:50%;top:0;right:0;bottom:0;border-left:3px solid #6b4727;background:var(--paper)}
+#stage.isomorphism-mode #cv{width:50%}
+#stage.isomorphism-mode #isoRightPane{display:block}
+#isoCv{position:absolute;inset:0;width:100%;height:100%;display:block;pointer-events:auto;touch-action:none;cursor:crosshair}
+.iso-pane-title.left{display:none}
+#stage.isomorphism-mode .iso-pane-title.left{display:block}
+.iso-pane-title{position:absolute;z-index:2;left:8px;top:8px;background:#fff;border:2px solid var(--ink);box-shadow:2px 2px 0 var(--ink);padding:3px 7px;font-size:12px;font-weight:bold;pointer-events:none}
+#isoRightStatus{position:absolute;z-index:2;left:8px;right:8px;top:42px;text-align:center;background:rgba(255,255,255,.9);padding:5px;font-size:12px;pointer-events:none}
+#isoMappingLegend{display:none;max-height:125px;overflow:auto;background:#fff;border:2px solid var(--ink);box-shadow:2px 2px 0 var(--ink);padding:6px;gap:6px 10px;flex-wrap:wrap;margin:8px 0}
+#isoMappingLegend.visible{display:flex}
+.iso-pair-chip{display:inline-flex;align-items:center;gap:4px;font-size:11px;white-space:nowrap}
+.iso-pair-chip i{width:11px;height:11px;border:1px solid var(--ink);display:inline-block;flex:0 0 auto}
+#stage.isomorphism-mode #zoom{right:calc(50% + 10px)}
+#stage.isomorphism-mode #badge{top:42px}
 #badge{position:absolute;left:8px;top:8px;background:#fff;border:3px solid var(--ink);box-shadow:3px 3px 0 var(--ink);padding:4px 8px;font-size:13px;pointer-events:none}
 #zoom{position:absolute;right:10px;bottom:10px;display:flex;flex-direction:column;gap:8px}
 #zoom .btn{font-size:20px;padding:0;width:46px}
-#dock{flex:0 0 auto;max-height:48vh;overflow-y:auto;background:#e8e4d8;border-top:4px solid var(--ink);padding:4px 10px 10px;-webkit-overflow-scrolling:touch}
+#dock{flex:0 0 auto;max-height:48vh;overflow-y:auto;background:#e8e4d8;border-top:4px solid #6b4727;padding:4px 10px 10px;-webkit-overflow-scrolling:touch}
 @media (min-width:900px){
   main{flex-direction:row}
-  #dock{width:390px;max-height:none;border-top:none;border-left:4px solid var(--ink)}
+  #dock{width:390px;max-height:none;border-top:none;border-left:4px solid #6b4727}
+  .scroll{padding:4px 10px 6px}
+  .tbtn{min-height:36px;font-size:11px}
+  .tbtn .ic{font-size:16px}
+  .logo{font-size:15px;letter-spacing:.5px;padding:1px 7px 1px 27px;border-width:2px;box-shadow:0 0 0 2px #8e5a27,2px 3px 0 #000,inset 0 2px 0 #ffd783}
+  .logo-cat{left:-5px;top:-7px;width:25px;height:25px;font-size:17px}
+  .sub{font-size:10px}
 }
 .dockhead{display:flex;align-items:flex-start;gap:6px;padding-top:6px}
 .dockhead #dockToggle{flex:0 0 auto;margin-top:2px}
@@ -55,10 +90,13 @@ main{flex:1;display:flex;flex-direction:column;min-height:0}
 .btn.tab{font-size:14px;min-width:0;width:100%;padding:6px 6px;white-space:normal;line-height:1.2;text-align:center}
 
 .row{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:8px 0}
-.desc{background:#fff;border:3px solid var(--ink);padding:8px 10px;font-size:14px;line-height:1.5}
+.desc{background:#fff9e8;border:3px solid #6b4727;padding:8px 10px;font-size:14px;line-height:1.5;box-shadow:3px 3px 0 #241b20}
 .desc .app{display:block;margin-top:4px;color:#257179;font-weight:bold}
 label.sel{display:flex;flex-direction:column;font-size:13px;flex:1;min-width:130px;gap:3px}
 select{font-family:var(--font);font-size:15px;min-height:44px;border:3px solid var(--ink);background:#fff;padding:4px;border-radius:0;box-shadow:3px 3px 0 var(--ink);color:var(--ink);width:100%}
+#mbody input[type=text]{font-family:var(--font);font-size:15px;min-height:44px;border:3px solid var(--ink);background:#fff;padding:6px 8px;border-radius:0;box-shadow:3px 3px 0 var(--ink);color:var(--ink);width:100%;margin-top:4px}
+#mbody input[type=number],#mbody textarea{font-family:var(--font);font-size:15px;min-height:44px;border:3px solid var(--ink);background:#fff;padding:6px 8px;border-radius:0;box-shadow:3px 3px 0 var(--ink);color:var(--ink);width:100%;margin-top:4px}
+#mbody textarea{min-height:82px;resize:vertical}
 .bigbtn{width:100%;font-size:17px;min-height:50px}
 .player .btn{flex:1;font-size:18px;padding:4px;min-width:44px}
 input[type=range]{flex:1;accent-color:var(--red);height:34px;min-width:120px}
@@ -114,7 +152,7 @@ ol.steps li{margin-bottom:6px}
 <body>
 <div id="app">
   <header>
-    <div class="titlebar"><span class="logo">&#9638; GRAPH LAB</span><span class="sub">Logistics &amp; Urban Planning</span></div>
+    <div class="titlebar"><span class="logo"><span class="logo-cat" aria-hidden="true">🐱</span>GRAPH LAB</span><span class="sub">Logistics &amp; Urban Planning</span></div>
     <div class="scroll" id="toolbar">
       <button type="button" class="btn tbtn on" data-tool="move"><span class="ic">✋</span>ย้าย/เลื่อน</button>
       <button type="button" class="btn tbtn" data-tool="node"><span class="ic">⬛</span>เพิ่มจุด</button>
@@ -122,22 +160,32 @@ ol.steps li{margin-bottom:6px}
       <button type="button" class="btn tbtn" data-tool="edit"><span class="ic">✏️</span>แก้ชื่อ/น้ำหนัก</button>
       <button type="button" class="btn tbtn" data-tool="bend"><span class="ic">〰️</span>ดัดเส้น</button>
       <button type="button" class="btn tbtn" data-tool="del"><span class="ic">🗑️</span>ลบ</button>
+      <button type="button" class="btn tbtn" data-tool="edgeColor"><span class="ic">🎨</span>ระบายสีเส้น</button>
       <span class="sep"></span>
       <button type="button" class="btn tbtn" id="aDir"><span class="ic" id="dirIc">—</span><span id="dirTxt">ไม่มีทิศ</span></button>
       <button type="button" class="btn tbtn" id="aUndo"><span class="ic">↶</span>Undo</button>
       <button type="button" class="btn tbtn" id="aRedo" disabled><span class="ic">↷</span>Redo</button>
       <button type="button" class="btn tbtn" id="aStraight"><span class="ic">📏</span>เส้นตรงหมด</button>
       <button type="button" class="btn tbtn" id="aPreset"><span class="ic">📂</span>ตัวอย่าง</button>
+      <button type="button" class="btn tbtn" id="aGenerate"><span class="ic">🧩</span>สร้างกราฟ</button>
+      <button type="button" class="btn tbtn" id="aLayout"><span class="ic">🪄</span>จัดวาง</button>
       <button type="button" class="btn tbtn" id="aPNG"><span class="ic">🖼️</span>PNG</button>
       <button type="button" class="btn tbtn" id="aClear"><span class="ic">🧹</span>ล้างกราฟ</button>
       <button type="button" class="btn tbtn" id="aHelp"><span class="ic">❓</span>วิธีใช้</button>
     </div>
   </header>
   <div id="hint"></div>
+  <div id="toolStatus" role="status" aria-live="polite"></div>
   <main>
     <div id="stage">
       <canvas id="cv"></canvas>
       <div id="badge"></div>
+      <div class="iso-pane-title left">กราฟที่ 1</div>
+      <div id="isoRightPane" aria-label="กราฟที่สองสำหรับเปรียบเทียบ">
+        <canvas id="isoCv"></canvas>
+        <div class="iso-pane-title">กราฟที่ 2</div>
+        <div id="isoRightStatus">เลือก Isomorphic Graphs แล้วเริ่มเปรียบเทียบเพื่อแสดงกราฟที่สอง</div>
+      </div>
       <div id="zoom">
         <button type="button" class="btn" id="zIn" title="ซูมเข้า">+</button>
         <button type="button" class="btn" id="zOut" title="ซูมออก">−</button>
@@ -150,6 +198,13 @@ ol.steps li{margin-bottom:6px}
         <button type="button" class="btn mini" id="dockToggle" title="ย่อ/ขยายแผง">▾</button>
       </div>
       <div id="algoDesc" class="desc collapsible"></div>
+      <div id="isoMappingLegend" aria-live="polite"></div>
+      <div id="quickTools" class="collapsible">
+        <input id="nodeSearch" type="search" placeholder="ค้นหาจุดยอด..." aria-label="ค้นหาจุดยอด">
+        <button type="button" class="btn" id="searchNode">🔎 ไปยังจุด</button>
+        <input id="quickCommand" type="text" placeholder="คำสั่ง: v1-v2:5" aria-label="คำสั่งสร้างเส้น">
+        <button type="button" class="btn" id="runCommand">↵ ทำคำสั่ง</button>
+      </div>
       <div class="row collapsible" id="selRow">
         <label class="sel" id="lblS"><span id="lblSText">ต้นทาง</span><select id="selS"></select></label>
         <label class="sel" id="lblT"><span id="lblTText">ปลายทาง</span><select id="selT"></select></label>
@@ -190,7 +245,8 @@ ol.steps li{margin-bottom:6px}
 const $ = s => document.querySelector(s);
 const $$ = s => [...document.querySelectorAll(s)];
 const cv = $('#cv'), ctx = cv.getContext('2d');
-const FONT = "'Pixelify Sans','Mitr',Tahoma,sans-serif";
+const isoCv = $('#isoCv'), isoCtx = isoCv.getContext('2d');
+const FONT = "'Mitr',Tahoma,sans-serif";
 const INK = '#1a1c2c', PAPER = '#f4efe1';
 const PALETTE = ['#ef7d57','#41a6f6','#a7f070','#ffcd75','#f4a6d7','#73eff7','#b13e53','#38b764','#c28a4a','#94b0c2','#5d275d','#3b5dc9','#257179','#d4a5ff','#566c86'];
 const NODE_FILL = {current:'#ffcd75', consider:'#ef7d57', visited:'#a7f070', path:'#38b764', inS:'#73eff7'};
@@ -204,9 +260,14 @@ const IOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform 
 
 function emptyGraph(){ return {nodes:[], edges:[], directed:false, nextId:1, nextEid:1, source:null, sink:null, colorNames:[]}; }
 let G = emptyGraph(), view = {x:0, y:0, s:1}, W = 300, H = 300, DPR = 1;
-let tool = 'move', selNode = null, undoStack = [], redoStack = [], algo = 'dijkstra';
+let isoGraph = null, isoFirstGraph = null, isoView = {x:0, y:0, s:1}, isoMapping = null, isoColors = [];
+let isoSplitView = false, isoPreviousView = null;
+let tool = 'move', selNode = null, isoSelNode = null, undoStack = [], redoStack = [], algo = 'dijkstra';
+let activeSide = 'left', lastActiveSide = 'left', sideContext = null;
 let run = null, stepIdx = 0, playing = false, timer = null, speed = 1;
 const pointers = new Map(); let drag = null, pinch = null, lastTap = {t:0, key:''};
+let hoverNode = null, hoverEdge = null, hoverStarted = 0, hoverFrame = 0;
+let edgePreview = null, isoEdgePreview = null;
 
 /* ---------- utils ---------- */
 const clamp = (v,a,b) => Math.max(a, Math.min(b, v));
@@ -232,8 +293,8 @@ function sanitize(g){
   g.nodes = (g.nodes||[]).filter(n => n && typeof n.id === 'number');
   g.nodes.forEach(n => { if(n.label == null) n.label = 'v'+n.id; if(n.color === undefined) n.color = null; });
   const ids = new Set(g.nodes.map(n => n.id));
-  g.edges = (g.edges||[]).filter(e => ids.has(e.u) && ids.has(e.v) && e.u !== e.v);
-  g.edges.forEach(e => { e.w = Number(e.w)||0; e.curve = e.curve||0; });
+  g.edges = (g.edges||[]).filter(e => ids.has(e.u) && ids.has(e.v));
+  g.edges.forEach(e => { e.w = Number(e.w)||0; e.curve = e.curve||0; if(e.color === undefined) e.color = null; });
   g.nextId = Math.max(g.nextId||1, 1, ...g.nodes.map(n => n.id+1));
   g.nextEid = Math.max(g.nextEid||1, 1, ...g.edges.map(e => e.id+1));
   if(!ids.has(g.source)) g.source = null;
@@ -241,9 +302,28 @@ function sanitize(g){
   if(!Array.isArray(g.colorNames)) g.colorNames = [];
   return g;
 }
-function save(){ try{ localStorage.setItem(LS_KEY, JSON.stringify({G, view, tab:algo})); }catch(_){} }
+function save(){
+  try{
+    const leftGraph=sideContext ? sideContext.graph : G;
+    const leftView=sideContext ? sideContext.view : view;
+    localStorage.setItem(LS_KEY, JSON.stringify({
+      G:leftGraph, view:leftView, tab:algo,
+      isoGraph:activeSide==='right' ? G : isoGraph,
+      isoView:activeSide==='right' ? view : isoView
+    }));
+  }catch(error){ console.error('Could not save graph state:',error); }
+}
 function load(){
-  try{ const d = JSON.parse(localStorage.getItem(LS_KEY)); if(d && d.G){ G = sanitize(d.G); if(d.view && isFinite(d.view.s)) view = d.view; return d.tab || 'dijkstra'; } }catch(_){}
+  try{
+    const d = JSON.parse(localStorage.getItem(LS_KEY));
+    if(d && d.G){
+      G=sanitize(d.G);
+      if(d.view && isFinite(d.view.s)) view=d.view;
+      if(d.isoGraph) isoGraph=sanitize(d.isoGraph);
+      if(d.isoView && isFinite(d.isoView.s)) isoView=d.isoView;
+      return d.tab || 'dijkstra';
+    }
+  }catch(error){ console.error('Could not load saved graph state:',error); }
   return null;
 }
 function updateHistoryButtons(){
@@ -251,32 +331,86 @@ function updateHistoryButtons(){
   $('#aRedo').disabled = !redoStack.length;
 }
 function pushUndo(){
-  undoStack.push(JSON.stringify(G));
+  undoStack.push({side:activeSide, graph:JSON.stringify(G)});
   if(undoStack.length > UNDO_MAX) undoStack.shift();
   redoStack = [];
   updateHistoryButtons();
 }
+function graphForSide(side){ return side==='right' ? isoGraph : G; }
+function restoreGraphForSide(side, graph){
+  if(side==='right') isoGraph=sanitize(graph);
+  else G=sanitize(graph);
+}
+function historyChange(side){
+  if(side==='right'){
+    if(algo==='isomorphism')invalidateIsomorphismResult();
+    isoSelNode=null;isoEdgePreview=null;
+    save();updateHistoryButtons();updateBadge();updateHint();
+    if(algo==='isomorphism')$('#isoRightStatus').textContent=`กราฟที่สองมี ${isoGraph?isoGraph.nodes.length:0} จุด • ${isoGraph?isoGraph.edges.length:0} เส้น — ใช้เครื่องมือด้านบนแก้ไขได้`;
+    draw();
+  }else{
+    selNode=null;edgePreview=null;afterChange();
+  }
+}
 function undo(){
   if(!undoStack.length) return toast('ไม่มีขั้นให้ย้อนแล้ว');
-  redoStack.push(JSON.stringify(G));
+  const entry=undoStack.pop(), current=graphForSide(entry.side) || emptyGraph();
+  redoStack.push({side:entry.side,graph:JSON.stringify(current)});
   if(redoStack.length > UNDO_MAX) redoStack.shift();
-  G = sanitize(JSON.parse(undoStack.pop())); selNode = null; clearRun(); afterChange();
+  restoreGraphForSide(entry.side,JSON.parse(entry.graph)); clearRun(); historyChange(entry.side);
   toast(`↶ ย้อนแล้ว (ไปข้างหน้าได้อีก ${redoStack.length} ขั้น)`);
 }
 function redo(){
   if(!redoStack.length) return toast('ไม่มีขั้นให้ไปข้างหน้าแล้ว');
-  undoStack.push(JSON.stringify(G));
+  const entry=redoStack.pop(), current=graphForSide(entry.side) || emptyGraph();
+  undoStack.push({side:entry.side,graph:JSON.stringify(current)});
   if(undoStack.length > UNDO_MAX) undoStack.shift();
-  G = sanitize(JSON.parse(redoStack.pop())); selNode = null; clearRun(); afterChange();
+  restoreGraphForSide(entry.side,JSON.parse(entry.graph)); clearRun(); historyChange(entry.side);
   toast(`↷ ไปข้างหน้าแล้ว (ไปข้างหน้าได้อีก ${redoStack.length} ขั้น)`);
 }
 function commit(fn, invalidate = true){ pushUndo(); fn(); if(invalidate) clearRun(); afterChange(); }
-function afterChange(){ save(); refreshSelects(); updateBadge(); updateHint(); updateHistoryButtons(); draw(); }
+function afterChange(){
+  if(algo==='isomorphism') invalidateIsomorphismResult();
+  save(); updateHistoryButtons(); draw();
+  if(activeSide==='right') return;
+  refreshSelects(); updateBadge(); updateHint();
+}
+
+function withCanvasSide(side, action){
+  if(side!=='right' || !isoSplitView){ activeSide='left';lastActiveSide='left';return action(); }
+  const previous={G,view,selNode,edgePreview};
+  sideContext={graph:G,view};
+  G=isoGraph || emptyGraph();
+  if(!isoGraph) G.directed=previous.G.directed;
+  view=isoView;
+  selNode=isoSelNode;
+  edgePreview=isoEdgePreview;
+  activeSide='right';lastActiveSide='right';
+  try{ return action(); }
+  finally{
+    isoGraph=G;isoView=view;isoSelNode=selNode;isoEdgePreview=edgePreview;
+    G=previous.G;view=previous.view;selNode=previous.selNode;edgePreview=previous.edgePreview;
+    activeSide='left';sideContext=null;
+    updateHistoryButtons();updateBadge();updateHint();
+      if(algo==='isomorphism'&&!isoFirstGraph&&isoGraph){
+      $('#isoRightStatus').textContent=`กราฟที่สองมี ${isoGraph.nodes.length} จุด • ${isoGraph.edges.length} เส้น — ใช้เครื่องมือด้านบนแก้ไขได้`;
+    }
+    draw();
+  }
+}
+function withLastCanvasSide(action){
+  return withCanvasSide(lastActiveSide,action);
+}
 
 /* ---------- geometry ---------- */
 function toWorld(sx, sy){ return {x:(sx-view.x)/view.s, y:(sy-view.y)/view.s}; }
 function edgeGeom(e){
-  const a = nodeById(e.u), b = nodeById(e.v); if(!a || !b || a === b) return null;
+  const a = nodeById(e.u), b = nodeById(e.v); if(!a || !b) return null;
+  if(a === b){
+    const offset = e.curve || 0, lift = 48 + Math.abs(offset);
+    return {a:{x:a.x-12,y:a.y-17},b:{x:a.x+12,y:a.y-17},mx:a.x+offset,my:a.y-lift/2,
+      nx:1,ny:0,cx:a.x+offset,cy:a.y-lift,px:a.x+offset,py:a.y-lift/2};
+  }
   const mx=(a.x+b.x)/2, my=(a.y+b.y)/2, dx=b.x-a.x, dy=b.y-a.y, L=Math.hypot(dx,dy)||1;
   const nx=-dy/L, ny=dx/L, c=e.curve||0;
   return {a, b, mx, my, nx, ny, cx:mx+nx*c*2, cy:my+ny*c*2, px:mx+nx*c, py:my+ny*c};
@@ -298,25 +432,82 @@ function hitEdge(w){
 /* ---------- rendering ---------- */
 function resize(){
   const r = $('#stage').getBoundingClientRect(); DPR = window.devicePixelRatio || 1;
-  W = Math.max(1, r.width); H = Math.max(1, r.height);
+  W = Math.max(1, isoSplitView ? r.width/2 : r.width); H = Math.max(1, r.height);
   cv.width = Math.round(W*DPR); cv.height = Math.round(H*DPR); cv.style.width = W+'px'; cv.style.height = H+'px';
+  if(isoSplitView){
+    const rightW = Math.max(1, r.width-W);
+    isoCv.width = Math.round(rightW*DPR); isoCv.height = Math.round(H*DPR);
+    isoCv.style.width = rightW+'px'; isoCv.style.height = H+'px';
+  }
   draw();
 }
 function currentStep(){ return run ? run.steps[stepIdx] : null; }
-function draw(){ ctx.setTransform(DPR,0,0,DPR,0,0); renderScene(ctx, W, H, view); }
-function renderScene(c, w, h, v){
-  c.fillStyle = PAPER; c.fillRect(0,0,w,h);
-  const gs = 40*v.s;
-  if(gs > 12){
-    c.fillStyle = '#d6cdb5';
-    const ox = ((v.x%gs)+gs)%gs, oy = ((v.y%gs)+gs)%gs;
-    for(let x=ox;x<w;x+=gs) for(let y=oy;y<h;y+=gs) c.fillRect(Math.round(x)-1, Math.round(y)-1, 3, 3);
+function draw(){
+  ctx.setTransform(DPR,0,0,DPR,0,0);
+  renderScene(ctx, W, H, view, algo === 'isomorphism' && isoFirstGraph ? isoFirstGraph : G, algo === 'isomorphism' ? null : undefined, false);
+  if(isoSplitView){
+    const r = $('#stage').getBoundingClientRect(), rightW = Math.max(1,r.width-W);
+    isoCtx.setTransform(DPR,0,0,DPR,0,0);
+    if(isoGraph) renderScene(isoCtx, rightW, H, isoView, isoGraph, null, true);
+    else { isoCtx.clearRect(0,0,rightW,H); isoCtx.fillStyle=PAPER; isoCtx.fillRect(0,0,rightW,H); }
   }
-  c.save(); c.translate(v.x, v.y); c.scale(v.s, v.s);
-  const st = currentStep(), showW = algo !== 'color';
-  for(const e of G.edges) drawEdge(c, e, st, showW);
-  for(const n of G.nodes) drawNode(c, n, st);
-  c.restore();
+}
+const CURSOR_STYLES = {
+  move: 'grab',
+  node: 'crosshair',
+  edge: 'crosshair',
+  edit: 'text',
+  bend: 'move',
+  del: 'not-allowed',
+  edgeColor: 'crosshair'
+};
+function updateCanvasCursor(){
+  cv.style.cursor = CURSOR_STYLES[tool] || 'default';
+  isoCv.style.cursor = CURSOR_STYLES[tool] || 'default';
+}
+function setHover(node, edge){
+  const nodeId = node ? node.id : null, edgeId = edge ? edge.id : null;
+  updateCanvasCursor();
+  if(nodeId === hoverNode && edgeId === hoverEdge) return;
+  hoverNode = nodeId; hoverEdge = edgeId; hoverStarted = performance.now();
+  updateCanvasCursor();
+  draw();
+  if((node || edge) && !hoverFrame) hoverFrame = requestAnimationFrame(animateHover);
+}
+function animateHover(){
+  if(hoverNode == null && hoverEdge == null){ hoverFrame = 0; return; }
+  draw(); hoverFrame = requestAnimationFrame(animateHover);
+}
+function renderScene(c, w, h, v, graph=G, stepOverride=undefined, comparisonPanel=false){
+  const previousGraph=G; G=graph;
+  try{
+    c.fillStyle = PAPER; c.fillRect(0,0,w,h);
+    const gs = 40*v.s;
+    if(gs > 12){
+      c.fillStyle = '#d6cdb5';
+      const ox = ((v.x%gs)+gs)%gs, oy = ((v.y%gs)+gs)%gs;
+      for(let x=ox;x<w;x+=gs) for(let y=oy;y<h;y+=gs) c.fillRect(Math.round(x)-1, Math.round(y)-1, 3, 3);
+    }
+    c.save(); c.translate(v.x, v.y); c.scale(v.s, v.s);
+    const st = stepOverride === undefined ? currentStep() : stepOverride, showW = algo !== 'color';
+    for(const e of G.edges) drawEdge(c, e, st, showW, comparisonPanel);
+    const preview=graph===isoGraph ? {node:isoSelNode,point:isoEdgePreview} : {node:selNode,point:edgePreview};
+    if(tool==='edge' && preview.node!=null && preview.point) drawEdgePreview(c,preview.node,preview.point);
+    for(const n of G.nodes) drawNode(c, n, st, comparisonPanel);
+    c.restore();
+  }finally{ G=previousGraph; }
+}
+function drawEdgePreview(c, sourceId, target){
+  const source = nodeById(sourceId); if(!source) return;
+  const dx = target.x-source.x, dy = target.y-source.y, length = Math.hypot(dx,dy);
+  if(length < 1) return;
+  const ux = dx/length, uy = dy/length, endNode = hitNode(target);
+  const start = {x:source.x+ux*NR, y:source.y+uy*NR};
+  const endDistance = endNode && endNode.id !== sourceId ? Math.max(NR, length-NR) : length;
+  const end = {x:source.x+ux*endDistance, y:source.y+uy*endDistance};
+  c.save(); c.beginPath(); c.moveTo(start.x,start.y); c.lineTo(end.x,end.y);
+  c.setLineDash([8,6]); c.lineWidth=4; c.strokeStyle='#ffcd75'; c.lineCap='round';
+  c.shadowColor=INK; c.shadowBlur=2; c.stroke(); c.restore();
 }
 function pill(c, x, y, text, bg, fg, border){
   c.font = `bold 13px ${FONT}`;
@@ -331,14 +522,26 @@ function tag(c, x, y, t, bg){
   c.fillStyle = bg; c.fillRect(x-7, y-7, 14, 14);
   c.fillStyle = '#fff'; c.font = `bold 11px ${FONT}`; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillText(t, x, y+1);
 }
-function drawEdge(c, e, st, showW){
+function roundedBox(c, x, y, size, radius=6){
+  const r = Math.min(radius, size/2);
+  c.beginPath(); c.moveTo(x+r,y); c.lineTo(x+size-r,y); c.quadraticCurveTo(x+size,y,x+size,y+r);
+  c.lineTo(x+size,y+size-r); c.quadraticCurveTo(x+size,y+size,x+size-r,y+size);
+  c.lineTo(x+r,y+size); c.quadraticCurveTo(x,y+size,x,y+size-r);
+  c.lineTo(x,y+r); c.quadraticCurveTo(x,y,x+r,y); c.closePath();
+}
+function drawEdge(c, e, st, showW, comparisonPanel=false){
   const g = edgeGeom(e); if(!g) return;
-  const key = st && st.edge ? st.edge[e.id] : null;
+  const hovered = !comparisonPanel && hoverEdge === e.id, key = st && st.edge ? st.edge[e.id] : null;
   const S = EDGE_STY[key] || EDGE_STY.base;
+  if(hovered){
+    const wobble = Math.sin((performance.now()-hoverStarted)/75)*2.5;
+    g.cx += g.nx*wobble; g.cy += g.ny*wobble; g.px += g.nx*wobble/2; g.py += g.ny*wobble/2;
+  }
   const path = () => { c.beginPath(); c.moveTo(g.a.x,g.a.y); c.quadraticCurveTo(g.cx,g.cy,g.b.x,g.b.y); };
   c.save(); c.lineCap = 'round'; c.lineJoin = 'round';
   if(S.hl){ c.setLineDash([]); c.strokeStyle = INK; c.lineWidth = S.w+4; path(); c.stroke(); }
-  c.setLineDash(S.dash ? [12,8] : []); c.strokeStyle = S.c; c.lineWidth = S.w; path(); c.stroke(); c.setLineDash([]);
+  const edgeColor = !key && e.color != null ? PALETTE[e.color % PALETTE.length] : S.c;
+  c.setLineDash(S.dash ? [12,8] : []); c.strokeStyle = hovered ? '#ef7d57' : edgeColor; c.lineWidth = S.w+(hovered?3:0); path(); c.stroke(); c.setLineDash([]);
   if(G.directed){
     let t1 = 1;
     for(let i=0;i<=60;i++){ const t=1-i/60, p=bez(g,t); if(Math.abs(p.x-g.b.x)>NR+4 || Math.abs(p.y-g.b.y)>NR+4){ t1=t; break; } }
@@ -348,24 +551,30 @@ function drawEdge(c, e, st, showW){
     c.beginPath(); c.moveTo(tip.x, tip.y);
     c.lineTo(tip.x-ux*sz-uy*sz*0.55, tip.y-uy*sz+ux*sz*0.55);
     c.lineTo(tip.x-ux*sz+uy*sz*0.55, tip.y-uy*sz-ux*sz*0.55); c.closePath();
-    c.fillStyle = S.c; c.fill(); c.lineWidth = 2; c.strokeStyle = INK; c.stroke();
+    c.fillStyle = edgeColor; c.fill(); c.lineWidth = 2; c.strokeStyle = INK; c.stroke();
   }
   const txt = st && st.etext ? st.etext[e.id] : (showW ? fmt(e.w) : null);
   if(txt != null) pill(c, g.px, g.py, txt, '#ffffff', INK, S.hl ? S.c : INK);
   c.restore();
 }
-function drawNode(c, n, st){
+function drawNode(c, n, st, comparisonPanel=false){
+  const hovered = !comparisonPanel && hoverNode === n.id;
+  if(hovered){
+    const phase = (performance.now()-hoverStarted)/75;
+    c.save(); c.translate(n.x,n.y); c.rotate(Math.sin(phase)*0.035);
+    const scale = 1.04+Math.sin(phase*2)*0.025; c.scale(scale,scale); c.translate(-n.x,-n.y);
+  }
   const sty = st && st.node ? st.node[n.id] : null, r = NR;
-  let fill = '#ffffff';
+  let fill = '#8bea3c';
   if(st && st.fill){ if(st.fill[n.id] != null) fill = PALETTE[st.fill[n.id] % PALETTE.length]; }
   else if(!st && n.color != null) fill = PALETTE[n.color % PALETTE.length];
   if(!(st && st.fill) && sty && NODE_FILL[sty]) fill = NODE_FILL[sty];
-  let ring = null; if(sty === 'current') ring = '#b13e53'; if(selNode === n.id) ring = '#41a6f6';
-  if(ring){ c.fillStyle = ring; c.fillRect(n.x-r-8, n.y-r-8, 2*r+16, 2*r+16); c.strokeStyle = INK; c.lineWidth = 2; c.strokeRect(n.x-r-8, n.y-r-8, 2*r+16, 2*r+16); }
-  c.fillStyle = 'rgba(26,28,44,0.9)'; c.fillRect(n.x-r+5, n.y-r+5, 2*r, 2*r);
-  c.fillStyle = fill; c.fillRect(n.x-r, n.y-r, 2*r, 2*r);
-  c.lineWidth = 3; c.strokeStyle = INK; c.strokeRect(n.x-r, n.y-r, 2*r, 2*r);
-  c.fillStyle = 'rgba(255,255,255,0.6)'; c.fillRect(n.x-r+4, n.y-r+4, 6, 6);
+  let ring = null; if(sty === 'current') ring = '#b13e53'; if((comparisonPanel?isoSelNode:selNode)===n.id) ring = '#41a6f6';
+  if(ring){ roundedBox(c, n.x-r-8, n.y-r-8, 2*r+16, 10); c.fillStyle = ring; c.fill(); c.strokeStyle = INK; c.lineWidth = 2; c.stroke(); }
+  roundedBox(c, n.x-r+5, n.y-r+5, 2*r, 9); c.fillStyle = 'rgba(26,28,44,0.9)'; c.fill();
+  roundedBox(c, n.x-r, n.y-r, 2*r, 9); c.fillStyle = fill; c.fill(); c.lineWidth = 3; c.strokeStyle = INK; c.stroke();
+  c.fillStyle = 'rgba(255,255,255,0.85)'; c.fillRect(n.x-r+5, n.y-r+5, 7, 4); c.fillRect(n.x-r+5, n.y-r+9, 4, 5);
+  c.fillStyle = 'rgba(26,28,44,0.18)'; c.fillRect(n.x+r-6, n.y-r+8, 3, 2*r-16); c.fillRect(n.x-r+8, n.y+r-6, 2*r-16, 3);
   const short = n.label.length <= 4;
   const label = short ? n.label : 'v'+n.id, numericLabel = /^\d+$/.test(label);
   c.fillStyle = textOn(fill); c.font = `bold ${numericLabel?16:(short?14:12)}px ${numericLabel?"Arial,Tahoma,sans-serif":FONT}`; c.textAlign = 'center'; c.textBaseline = 'middle';
@@ -375,6 +584,7 @@ function drawNode(c, n, st){
   if(T && T.s && G.source === n.id) tag(c, n.x-r, n.y+r, 'S', '#38b764');
   if(T && T.t && G.sink === n.id) tag(c, n.x+r, n.y+r, 'T', '#b13e53');
   if(st && st.ntext && st.ntext[n.id] != null) pill(c, n.x, n.y-r-17, st.ntext[n.id], '#ffcd75', INK, INK);
+  if(hovered) c.restore();
 }
 
 /* ---------- view ---------- */
@@ -383,7 +593,45 @@ function zoomAt(sx, sy, f){
   view.x = sx-(sx-view.x)*f; view.y = sy-(sy-view.y)*f; view.s = ns; draw(); saveSoon();
 }
 let saveT; function saveSoon(){ clearTimeout(saveT); saveT = setTimeout(save, 400); }
+function fitGraphView(graph, width, height){
+  if(!graph || !graph.nodes.length) return {x:width/2,y:height/2,s:1};
+  let x0=Infinity,y0=Infinity,x1=-Infinity,y1=-Infinity;
+  graph.nodes.forEach(node=>{x0=Math.min(x0,node.x);y0=Math.min(y0,node.y);x1=Math.max(x1,node.x);y1=Math.max(y1,node.y);});
+  x0-=80;x1+=80;y0-=60;y1+=90;
+  const top=88,bottom=52,availableHeight=Math.max(1,height-top-bottom);
+  const scale=clamp(Math.min(width/(x1-x0),availableHeight/(y1-y0)),MINS,1.6);
+  return {s:scale,x:width/2-(x0+x1)/2*scale,y:top+availableHeight/2-(y0+y1)/2*scale};
+}
+function setIsomorphismSplit(enabled){
+  if(enabled===isoSplitView) return;
+  if(enabled){
+    isoPreviousView={...view};
+    isoSplitView=true;
+    lastActiveSide='left';
+    $('#stage').classList.add('isomorphism-mode');
+    resize();
+    fitView();
+    if(isoGraph){
+      const r=$('#stage').getBoundingClientRect();
+      isoView=fitGraphView(isoGraph,Math.max(1,r.width-W),H);
+    }
+  }else{
+    isoSplitView=false;
+    lastActiveSide='left';isoSelNode=null;isoEdgePreview=null;
+    $('#stage').classList.remove('isomorphism-mode');
+    if(isoPreviousView) view=isoPreviousView;
+    isoPreviousView=null;
+    resize();
+  }
+}
 function fitView(){
+  if(isoSplitView){
+    if(lastActiveSide==='right'&&isoGraph){
+      const r=$('#stage').getBoundingClientRect();
+      isoView=fitGraphView(isoGraph,Math.max(1,r.width-W),H);
+    }else view=fitGraphView(G,W,H);
+    draw();save();return;
+  }
   if(!G.nodes.length){ view = {x:W/2, y:H/2, s:1}; draw(); return; }
   let x0=Infinity, y0=Infinity, x1=-Infinity, y1=-Infinity;
   G.nodes.forEach(n => { x0=Math.min(x0,n.x); y0=Math.min(y0,n.y); x1=Math.max(x1,n.x); y1=Math.max(y1,n.y); });
@@ -393,61 +641,89 @@ function fitView(){
 }
 
 /* ---------- pointer / touch ---------- */
-function ptr(e){ const r = cv.getBoundingClientRect(); return {x:e.clientX-r.left, y:e.clientY-r.top}; }
-cv.addEventListener('pointerdown', e => {
-  e.preventDefault();
-  try{ cv.setPointerCapture(e.pointerId); }catch(_){}
-  const p = ptr(e); pointers.set(e.pointerId, p);
-  if(pointers.size === 2){
-    const [a,b] = [...pointers.values()];
-    pinch = {d:Math.hypot(a.x-b.x,a.y-b.y)||1, cx:(a.x+b.x)/2, cy:(a.y+b.y)/2, v:{...view}};
-    if(drag && drag.undo) save();
-    drag = null; return;
-  }
-  if(pointers.size > 2) return;
-  const w = toWorld(p.x, p.y), n = hitNode(w), ed = n ? null : hitEdge(w);
-  let type = 'tap';
-  if(n && (tool === 'move' || tool === 'node')) type = 'node';
-  else if(ed && tool === 'bend') type = 'bend';
-  else if(!n && !ed) type = 'pan';
-  drag = {type, n, ed, w, sx:p.x, sy:p.y, lx:p.x, ly:p.y, moved:false, undo:false, offX:n?n.x-w.x:0, offY:n?n.y-w.y:0};
-});
-cv.addEventListener('pointermove', e => {
-  if(!pointers.has(e.pointerId)) return;
-  const p = ptr(e); pointers.set(e.pointerId, p);
-  if(pinch && pointers.size >= 2){
-    const [a,b] = [...pointers.values()];
-    const d = Math.hypot(a.x-b.x,a.y-b.y)||1, cx = (a.x+b.x)/2, cy = (a.y+b.y)/2;
-    const ns = clamp(pinch.v.s*d/pinch.d, MINS, MAXS);
-    const wx = (pinch.cx-pinch.v.x)/pinch.v.s, wy = (pinch.cy-pinch.v.y)/pinch.v.s;
-    view.s = ns; view.x = cx-wx*ns; view.y = cy-wy*ns; draw(); return;
-  }
-  if(!drag) return;
-  if(!drag.moved && Math.hypot(p.x-drag.sx, p.y-drag.sy) > 6) drag.moved = true;
-  if(!drag.moved) return;
-  const w = toWorld(p.x, p.y);
-  if(drag.type === 'node'){ if(!drag.undo){ pushUndo(); drag.undo = true; } drag.n.x = w.x+drag.offX; drag.n.y = w.y+drag.offY; }
-  else if(drag.type === 'pan'){ view.x += p.x-drag.lx; view.y += p.y-drag.ly; }
-  else if(drag.type === 'bend'){
-    if(!drag.undo){ pushUndo(); drag.undo = true; }
-    const g = edgeGeom(drag.ed); if(g){ let cv2 = (w.x-g.mx)*g.nx+(w.y-g.my)*g.ny; if(Math.abs(cv2) < 6) cv2 = 0; drag.ed.curve = cv2; }
-  }
-  drag.lx = p.x; drag.ly = p.y; draw();
-});
-function endPtr(e){
-  if(!pointers.has(e.pointerId)) return;
-  pointers.delete(e.pointerId);
-  if(pinch){ if(pointers.size < 2){ pinch = null; save(); } drag = null; return; }
-  if(!drag) return;
-  const d = drag; drag = null;
-  if(d.moved){ save(); return; }
-  if(e.type === 'pointercancel') return;
-  handleTap(d);
+function ptr(e,canvas){ const r=canvas.getBoundingClientRect();return {x:e.clientX-r.left,y:e.clientY-r.top}; }
+function bindCanvas(canvas,side){
+  const listen=(name,handler,options)=>canvas.addEventListener(name,e=>withCanvasSide(side,()=>handler(e)),options);
+  listen('pointerdown',e=>{
+    e.preventDefault();lastActiveSide=side;
+    if(side==='left')setHover(null,null);
+    if(side==='left'){updateBadge();updateHint();}
+    try{canvas.setPointerCapture(e.pointerId);}catch(_){}
+    const p=ptr(e,canvas);pointers.set(e.pointerId,p);
+    if(pointers.size===2){
+      const [a,b]=[...pointers.values()];
+      pinch={side,d:Math.hypot(a.x-b.x,a.y-b.y)||1,cx:(a.x+b.x)/2,cy:(a.y+b.y)/2,v:{...view}};
+      if(drag&&drag.undo)save();
+      drag=null;return;
+    }
+    if(pointers.size>2)return;
+    const w=toWorld(p.x,p.y),n=hitNode(w),ed=n?null:hitEdge(w);
+    let type='tap';
+    if(n&&(tool==='move'||tool==='node'))type='node';
+    else if(ed&&tool==='bend')type='bend';
+    else if(!n&&!ed)type='pan';
+    drag={side,type,n,ed,w,sx:p.x,sy:p.y,lx:p.x,ly:p.y,moved:false,undo:false,offX:n?n.x-w.x:0,offY:n?n.y-w.y:0};
+  });
+  listen('pointermove',e=>{
+    if(!pointers.has(e.pointerId)){
+      if(e.pointerType!=='touch'){
+        const p=ptr(e,canvas),w=toWorld(p.x,p.y),n=hitNode(w),ed=n?null:hitEdge(w);
+        if(tool==='edge'&&(side==='right'?isoSelNode:selNode)!=null){
+          if(side==='right')isoEdgePreview=w;else edgePreview=w;
+          draw();
+        }
+        if(side==='left')setHover(n,ed);
+      }
+      return;
+    }
+    if(drag&&drag.side!==side)return;
+    const p=ptr(e,canvas);pointers.set(e.pointerId,p);
+    if(pinch&&pinch.side===side&&pointers.size>=2){
+      const [a,b]=[...pointers.values()];
+      const d=Math.hypot(a.x-b.x,a.y-b.y)||1,cx=(a.x+b.x)/2,cy=(a.y+b.y)/2;
+      const ns=clamp(pinch.v.s*d/pinch.d,MINS,MAXS);
+      const wx=(pinch.cx-pinch.v.x)/pinch.v.s,wy=(pinch.cy-pinch.v.y)/pinch.v.s;
+      view.s=ns;view.x=cx-wx*ns;view.y=cy-wy*ns;draw();return;
+    }
+    if(!drag)return;
+    if(!drag.moved&&Math.hypot(p.x-drag.sx,p.y-drag.sy)>6)drag.moved=true;
+    if(!drag.moved)return;
+    const w=toWorld(p.x,p.y);
+    if(drag.type==='node'){
+      if(!drag.undo){pushUndo();drag.undo=true;invalidateIsomorphismResult();}
+      drag.n.x=w.x+drag.offX;drag.n.y=w.y+drag.offY;
+    }else if(drag.type==='pan'){view.x+=p.x-drag.lx;view.y+=p.y-drag.ly;}
+    else if(drag.type==='bend'){
+      if(!drag.undo){pushUndo();drag.undo=true;invalidateIsomorphismResult();}
+      const g=edgeGeom(drag.ed);
+      if(g){let curve=(w.x-g.mx)*g.nx+(w.y-g.my)*g.ny;if(Math.abs(curve)<6)curve=0;drag.ed.curve=curve;}
+    }
+    drag.lx=p.x;drag.ly=p.y;draw();
+  });
+  const endPtr=e=>{
+    if(!pointers.has(e.pointerId))return;
+    pointers.delete(e.pointerId);
+    if(pinch&&pinch.side===side){if(pointers.size<2){pinch=null;save();}drag=null;return;}
+    if(!drag||drag.side!==side)return;
+    const d=drag;drag=null;
+    if(d.moved){save();return;}
+    if(e.type==='pointercancel')return;
+    handleTap(d);
+  };
+  listen('pointerup',endPtr);
+  listen('pointercancel',endPtr);
+  listen('pointerleave',()=>{
+    if(!pointers.size){
+      if(side==='right')isoEdgePreview=null;else edgePreview=null;
+      if(side==='left')setHover(null,null);
+      draw();
+    }
+  });
+  listen('contextmenu',e=>e.preventDefault());
+  listen('wheel',e=>{e.preventDefault();const p=ptr(e,canvas);zoomAt(p.x,p.y,Math.exp(-e.deltaY*0.0015));},{passive:false});
 }
-cv.addEventListener('pointerup', endPtr);
-cv.addEventListener('pointercancel', endPtr);
-cv.addEventListener('contextmenu', e => e.preventDefault());
-cv.addEventListener('wheel', e => { e.preventDefault(); const p = ptr(e); zoomAt(p.x, p.y, Math.exp(-e.deltaY*0.0015)); }, {passive:false});
+bindCanvas(cv,'left');
+bindCanvas(isoCv,'right');
 document.addEventListener('gesturestart', e => e.preventDefault());
 
 function handleTap(d){
@@ -463,14 +739,20 @@ function handleTap(d){
       if(!n && !ed) addNodeAt(w.x, w.y); else if(n && dbl) renameNode(n);
       break;
     case 'edge':
-      if(!n){ selNode = null; updateHint(); draw(); break; }
-      if(selNode == null || !nodeById(selNode)){ selNode = n.id; }
-      else if(selNode === n.id){ selNode = null; }
-      else { const u = selNode; selNode = null; addEdge(u, n.id); }
+      if(!n){
+        if(activeSide==='right'){isoSelNode=null;isoEdgePreview=null;}
+        else{selNode=null;edgePreview=null;updateHint();}
+        draw();break;
+      }
+      if(selNode==null||!nodeById(selNode)){selNode=n.id;}
+      else{const u=selNode;selNode=null;addEdge(u,n.id);}
+      if(activeSide==='right')isoEdgePreview={x:w.x,y:w.y};
+      else edgePreview={x:w.x,y:w.y};
       updateHint(); draw();
       break;
     case 'edit': if(n) renameNode(n); else if(ed) editWeight(ed); break;
     case 'del': if(n) deleteNode(n); else if(ed) deleteEdge(ed); break;
+    case 'edgeColor': if(ed) showEdgeColors(ed); break;
     case 'bend': if(ed && ed.curve){ commit(() => { ed.curve = 0; }, false); toast('📏 ทำให้เส้นตรงแล้ว'); } break;
   }
 }
@@ -488,23 +770,26 @@ function askWeight(def, msg){
   for(;;){
     const s = prompt(msg, String(def)); if(s === null) return null;
     const t = String(s).trim().replace(',', '.'), v = Number(t);
-    if(t !== '' && isFinite(v) && v >= 0) return v;
-    alert('⚠ น้ำหนักต้องเป็นตัวเลขที่ไม่ติดลบ เช่น 5 หรือ 2.5');
+    if(t !== '' && isFinite(v)) return v;
+    alert('⚠ น้ำหนักต้องเป็นตัวเลข เช่น 5, 2.5 หรือ -3');
   }
 }
 function addEdge(u, v){
-  if(u === v) return toast('ไม่อนุญาตให้เชื่อมจุดกับตัวเอง (loop)');
-  const dup = G.edges.find(e => (e.u === u && e.v === v) || (!G.directed && e.u === v && e.v === u));
-  if(dup){ toast('มีเส้นนี้อยู่แล้ว → เปลี่ยนน้ำหนักแทน'); editWeight(dup); return; }
-  const w = askWeight(1, `น้ำหนักของเส้น ${nm(u)} ${G.directed?'→':'–'} ${nm(v)}\n(ระยะทาง / ค่าใช้จ่าย / ความจุ — ไม่ติดลบ)`);
+  const w = askWeight(1, `น้ำหนักของเส้น ${nm(u)} ${G.directed?'→':'–'} ${nm(v)}\n(รองรับจำนวนเต็ม ทศนิยม และค่าติดลบ)`);
   if(w === null) return;
-  commit(() => {
-    const e = {id:G.nextEid++, u, v, w, curve:0};
-    const rev = G.directed && G.edges.find(x => x.u === v && x.v === u);
-    if(rev){ e.curve = 28; if(!rev.curve) rev.curve = 28; }
-    G.edges.push(e);
-  });
+  commit(() => storeEdge(u, v, w));
   toast(`🔗 สร้างเส้น ${nm(u)} ${G.directed?'→':'–'} ${nm(v)} = ${fmt(w)}`);
+}
+function storeEdge(u, v, w){
+  const parallel = G.edges.filter(x => G.directed
+    ? x.u === u && x.v === v
+    : (x.u === u && x.v === v) || (x.u === v && x.v === u));
+  const lanes = [0, 24, -24, 48, -48, 72, -72];
+  const e = {id:G.nextEid++, u, v, w, color:null, curve:parallel.length ? lanes[parallel.length % lanes.length] : 0};
+  if(u === v && parallel.length) e.curve = 18 * (parallel.length + 1);
+  const reverse = G.directed && G.edges.find(x => x.u === v && x.v === u && x.u !== x.v);
+  if(reverse){ e.curve = e.curve || 28; if(!reverse.curve) reverse.curve = 28; }
+  G.edges.push(e);
 }
 function renameNode(n){
   const s = prompt('ตั้งชื่อจุดยอด (เช่น คลังสินค้า, ร้านค้า 1, โรงพยาบาล):', n.label);
@@ -513,9 +798,17 @@ function renameNode(n){
   commit(() => { n.label = t; }, false);
 }
 function editWeight(e){
-  const w = askWeight(e.w, `น้ำหนักใหม่ของเส้น ${edgeName(e)} (ไม่ติดลบ):`);
+  const w = askWeight(e.w, `น้ำหนักใหม่ของเส้น ${edgeName(e)}:`);
   if(w === null) return;
   commit(() => { e.w = w; });
+}
+function showEdgeColors(edge){
+  openModal(`🎨 ระบายสีเส้น ${edgeName(edge)}`,
+    `<p>เลือกสีสำหรับเส้นนี้ (สีจะบันทึกในกราฟและ PNG)</p><div class="pgrid">`+
+    PALETTE.map((color,index)=>`<button type="button" class="btn" data-edge-color="${index}" style="background:${color}">สี ${index+1}</button>`).join('')+
+    `<button type="button" class="btn" data-edge-color="-1">ล้างสี</button></div>`);
+  $('#mbody').dataset.edgeId=String(edge.id);
+  $('#mbody').dataset.edgeSide=activeSide;
 }
 function deleteNode(n){
   commit(() => {
@@ -553,6 +846,87 @@ function degreeInfo(){
   G.edges.forEach(e => { d[e.u].deg++; d[e.v].deg++; d[e.u].out++; d[e.v].in++; });
   return d;
 }
+function isBipartite(){
+  const color=new Map(),adj=nbrSets();
+  for(const n of G.nodes)if(!color.has(n.id)){
+    color.set(n.id,0);const q=[n.id];
+    while(q.length){const u=q.shift();for(const v of adj.get(u)){if(!color.has(v)){color.set(v,1-color.get(u));q.push(v);}else if(color.get(v)===color.get(u))return false;}}
+  }
+  return !G.edges.some(e=>e.u===e.v);
+}
+function isDAG(){
+  if(!G.directed)return false;
+  const indeg=new Map(G.nodes.map(n=>[n.id,0])),adj=new Map(G.nodes.map(n=>[n.id,[]]));
+  for(const e of G.edges){adj.get(e.u).push(e.v);indeg.set(e.v,indeg.get(e.v)+1);}
+  const q=G.nodes.filter(n=>indeg.get(n.id)===0).map(n=>n.id);let visited=0;
+  while(q.length){const u=q.shift();visited++;for(const v of adj.get(u)){indeg.set(v,indeg.get(v)-1);if(indeg.get(v)===0)q.push(v);}}
+  return visited===G.nodes.length;
+}
+function isStronglyConnected(){
+  if(!G.directed||!G.nodes.length)return false;
+  const reach=start=>{
+    const adj=new Map(G.nodes.map(n=>[n.id,[]]));
+    for(const e of G.edges)adj.get(start===-1?e.v:e.u).push(start===-1?e.u:e.v);
+    const seen=new Set([G.nodes[0].id]),q=[G.nodes[0].id];
+    while(q.length){for(const v of adj.get(q.shift()))if(!seen.has(v)){seen.add(v);q.push(v);}}
+    return seen.size===G.nodes.length;
+  };
+  return reach(1)&&reach(-1);
+}
+function graphMetrics(){
+  const ids=G.nodes.map(n=>n.id),adj=outAdj(),n=ids.length;
+  const distances=new Map(),ecc=new Map(),degreeCent=new Map(),closeness=new Map(),betweenness=new Map(),clustering=new Map();
+  for(const source of ids){
+    const dist=new Map([[source,0]]),q=[source];
+    while(q.length){const u=q.shift();for(const a of adj.get(u))if(!dist.has(a.to)){dist.set(a.to,dist.get(u)+1);q.push(a.to);}}
+    distances.set(source,dist);
+    ecc.set(source,dist.size===n?Math.max(0,...dist.values()):Infinity);
+    const sum=[...dist.values()].reduce((a,b)=>a+b,0);
+    closeness.set(source,n>1&&sum>0?(dist.size-1)/sum:0);
+    const neighbors=nbrSets().get(source),k=neighbors.size;
+    let links=0;for(const u of neighbors)for(const v of neighbors)if(u<v&&nbrSets().get(u).has(v))links++;
+    clustering.set(source,k<2?0:2*links/(k*(k-1)));
+    degreeCent.set(source,n>1?neighbors.size/(n-1):0);
+  }
+  if(n<=500){
+    const centralAdj=new Map(ids.map(id=>[id,adj.get(id).map(a=>a.to)]));
+    for(const source of ids){
+      const stack=[],pred=new Map(ids.map(id=>[id,[]])),sigma=new Map(ids.map(id=>[id,0])),dist=new Map(ids.map(id=>[id,-1]));
+      sigma.set(source,1);dist.set(source,0);const q=[source];
+      while(q.length){const v=q.shift();stack.push(v);for(const w of centralAdj.get(v)){
+        if(dist.get(w)<0){dist.set(w,dist.get(v)+1);q.push(w);}
+        if(dist.get(w)===dist.get(v)+1){sigma.set(w,sigma.get(w)+sigma.get(v));pred.get(w).push(v);}
+      }}
+      const delta=new Map(ids.map(id=>[id,0]));
+      while(stack.length){const w=stack.pop();for(const v of pred.get(w))if(sigma.get(w))delta.set(v,delta.get(v)+sigma.get(v)/sigma.get(w)*(1+delta.get(w)));if(w!==source)betweenness.set(w,(betweenness.get(w)||0)+delta.get(w));}
+    }
+    const scale=G.directed?((n-1)*(n-2)):((n-1)*(n-2)/2);
+    if(scale>0)for(const id of ids)betweenness.set(id,(betweenness.get(id)||0)/(scale*(G.directed?1:2)));
+    else for(const id of ids)betweenness.set(id,0);
+  }
+  let girth=Infinity;
+  if(!G.directed){
+    for(const e of G.edges)if(e.u===e.v)girth=1;
+    const pairs=new Map();
+    for(const e of G.edges)if(e.u!==e.v){const key=`${Math.min(e.u,e.v)}:${Math.max(e.u,e.v)}`;pairs.set(key,(pairs.get(key)||0)+1);}
+    for(const count of pairs.values())if(count>1)girth=Math.min(girth,2);
+    const simpleAdj=new Map(ids.map(id=>[id,[]]));
+    for(const e of G.edges)if(e.u!==e.v){simpleAdj.get(e.u).push([e.v,e.id]);simpleAdj.get(e.v).push([e.u,e.id]);}
+    for(const source of ids){
+      const dist=new Map([[source,0]]),parentEdge=new Map(),q=[source];
+      while(q.length){const u=q.shift();for(const [v,eid] of simpleAdj.get(u)){
+        if(!dist.has(v)){dist.set(v,dist.get(u)+1);parentEdge.set(v,eid);q.push(v);}
+        else if(parentEdge.get(u)!==eid&&parentEdge.get(v)!==eid)girth=Math.min(girth,dist.get(u)+dist.get(v)+1);
+      }}
+    }
+  }
+  const connected=n>0&&(G.directed?isStronglyConnected():components().length===1);
+  return {ecc,degreeCent,closeness,betweenness,clustering,girth,connected,
+    radius:connected?Math.min(...ecc.values()):Infinity,
+    diameter:connected?Math.max(...ecc.values()):Infinity,
+    center:connected?ids.filter(id=>ecc.get(id)===Math.min(...ecc.values())):[],
+    periphery:connected?ids.filter(id=>ecc.get(id)===Math.max(...ecc.values())):[]};
+}
 function mkStep(msg, b, ex){
   ex = ex || {};
   return {msg, ntext:ex.ntext||b.ntext||null, node:Object.assign({}, b.node, ex.node), edge:Object.assign({}, b.edge, ex.edge), etext:ex.etext||b.etext||null, fill:ex.fill||b.fill||null};
@@ -579,8 +953,26 @@ function matrixHTML(kind){
 function analysisHTML(){
   const n = G.nodes.length, m = G.edges.length, deg = degreeInfo(), comps = components();
   const sumDeg = G.nodes.reduce((a,x) => a+deg[x.id].deg, 0), neg = G.edges.filter(e => e.w < 0);
+  const loops=G.edges.filter(e=>e.u===e.v).length, keys=new Set(),parallel=G.edges.reduce((a,e)=>{
+    const k=G.directed?`${e.u}>${e.v}`:`${Math.min(e.u,e.v)}-${Math.max(e.u,e.v)}`;
+    if(keys.has(k))return a+1;keys.add(k);return a;
+  },0);
+  const simple=!loops&&!parallel, maxEdges=G.directed?n*(n-1):n*(n-1)/2;
+  const density=maxEdges?m/maxEdges:0, tree=!G.directed&&simple&&n>0&&comps.length===1&&m===n-1;
+  const complete=simple&&m===maxEdges, bipartite=isBipartite();
+  const degreeSeq=G.nodes.map(x=>deg[x.id].deg).sort((a,b)=>b-a);
+  const weightSum=G.edges.reduce((a,e)=>a+e.w,0);
   let h = `<div class="cards">${card('|V| จำนวนจุดยอด', n)}${card('|E| จำนวนเส้นเชื่อม', m)}${card('ชนิดกราฟ', G.directed?'มีทิศทาง →':'ไม่มีทิศทาง —')}${card('Components', comps.length)}</div>`;
   if(!n) return h + '<div class="hero warn">ยังไม่มีจุดยอด ลองกด 📂 ตัวอย่าง หรือ ⬛ เพิ่มจุด</div>';
+  h += `<h3>คุณสมบัติ</h3><div class="cards">${card('Simple',simple?'ใช่':'ไม่ใช่')}${card('Self-loop',loops)}${card('เส้นขนานเพิ่มเติม',parallel)}${card('Complete',complete?'ใช่':'ไม่ใช่')}${card('Bipartite',bipartite?'ใช่':'ไม่ใช่')}${card('Tree',tree?'ใช่':'ไม่ใช่')}${card('DAG',isDAG()?'ใช่':'ไม่ใช่')}${card('Strongly Connected',isStronglyConnected()?'ใช่':'ไม่ใช่')}${card('Density',density.toFixed(3))}${card('ผลรวมน้ำหนัก',fmt(weightSum))}</div>`;
+  h += `<p><b>Degree Sequence:</b> (${degreeSeq.join(', ')})</p>`;
+  const metrics=graphMetrics();
+  h += `<h3>ระยะทางและโครงสร้าง</h3><div class="cards">${card('Girth',metrics.girth===Infinity?'ไม่มีวงจร':metrics.girth)}${card('Radius',metrics.connected?fmt(metrics.radius):'กราฟไม่เชื่อมต่อ')}${card('Diameter',metrics.connected?fmt(metrics.diameter):'กราฟไม่เชื่อมต่อ')}${card('Center',metrics.center.map(id=>esc(nm(id))).join(', ') || '—')}${card('Periphery',metrics.periphery.map(id=>esc(nm(id))).join(', ') || '—')}</div>`;
+  if(n<=500){
+    h += '<div class="tw"><table class="tbl"><tr><th>จุด</th><th>Degree</th><th>Closeness</th><th>Betweenness</th><th>Clustering</th></tr>';
+    for(const node of G.nodes)h+=`<tr><td>${esc(nm(node.id))}</td><td>${fmt(metrics.degreeCent.get(node.id))}</td><td>${fmt(metrics.closeness.get(node.id))}</td><td>${fmt(metrics.betweenness.get(node.id)||0)}</td><td>${fmt(metrics.clustering.get(node.id))}</td></tr>`;
+    h += '</table></div>';
+  }else h += '<p>คำนวณ Centrality เมื่อ |V| ≤ 500</p>';
   h += comps.length <= 1
     ? `<div class="hero">✔ กราฟเชื่อมต่อกัน (Connected)${G.directed?' แบบไม่สนทิศ':''} — Prim จะได้ Spanning Tree เดียว</div>`
     : `<div class="hero warn">⚠ กราฟไม่เชื่อมต่อ มี ${comps.length} ส่วน — Prim จะได้ Spanning Forest และ Flow/Dijkstra อาจไปไม่ถึงบางจุด</div>`;
@@ -594,215 +986,257 @@ function analysisHTML(){
   if(n <= 30){
     h += `<h3>Adjacency Matrix</h3><p style="font-size:13px">แถว = ต้นทาง, คอลัมน์ = ปลายทาง, ตัวเลข = จำนวนเส้น</p>` + matrixHTML('A');
     h += `<h3>Weight Matrix</h3><p style="font-size:13px">∞ = ไม่มีเส้นตรงถึงกัน (ถ้ามีหลายเส้นจะใช้ค่าน้อยสุด)</p>` + matrixHTML('W');
+    const ids=G.nodes.map(x=>x.id), adj=outAdj();
+    h += '<h3>Adjacency List</h3><div class="tw"><table class="tbl"><tr><th>จุด</th><th class="l">เพื่อนบ้าน (น้ำหนัก)</th></tr>';
+    for(const id of ids) h += `<tr><th>${esc(nm(id))}</th><td class="l">${adj.get(id).map(a=>`${esc(nm(a.to))} (${fmt(a.w)})`).join(', ') || '—'}</td></tr>`;
+    h += '</table></div>';
+    h += '<h3>Incidence Matrix</h3><p style="font-size:13px">คอลัมน์ e = เส้นเชื่อม; loop ในกราฟไม่มีทิศใช้ค่า 2</p><div class="tw"><table class="tbl"><tr><th></th>';
+    h += G.edges.map((e,i)=>`<th title="${esc(edgeName(e))}">e${i+1}</th>`).join('')+'</tr>';
+    for(const id of ids){
+      h += `<tr><th title="${esc(nm(id))}">${esc(nm(id))}</th>`;
+      h += G.edges.map(e=>{
+        let value=0;
+        if(G.directed){if(e.u===id)value--;if(e.v===id)value++;}
+        else if(e.u===id&&e.v===id)value=2;
+        else if(e.u===id||e.v===id)value=1;
+        return `<td>${value}</td>`;
+      }).join('')+'</tr>';
+    }
+    h += '</table></div>';
+    const dist=ids.map(()=>ids.map(()=>Infinity));
+    ids.forEach((id,i)=>{dist[i][i]=0;const q=[id];while(q.length){const u=q.shift(),ui=ids.indexOf(u);for(const a of adj.get(u))if(dist[i][ids.indexOf(a.to)]===Infinity){dist[i][ids.indexOf(a.to)]=dist[i][ui]+1;q.push(a.to);}}});
+    h += '<h3>Distance Matrix (จำนวนเส้น)</h3><div class="tw"><table class="tbl"><tr><th></th>'+ids.map(id=>`<th title="${esc(nm(id))}">${esc(nm(id))}</th>`).join('')+'</tr>';
+    ids.forEach((id,i)=>{h+=`<tr><th title="${esc(nm(id))}">${esc(nm(id))}</th>`+dist[i].map(v=>`<td>${v===Infinity?'∞':v}</td>`).join('')+'</tr>';});
+    h += '</table></div>';
+    const reach=ids.map((_,i)=>dist[i].map(v=>v<Infinity));
+    h += '<h3>Reachability Matrix (Transitive Closure)</h3><div class="tw"><table class="tbl"><tr><th></th>'+ids.map(id=>`<th title="${esc(nm(id))}">${esc(nm(id))}</th>`).join('')+'</tr>';
+    ids.forEach((id,i)=>{h+=`<tr><th title="${esc(nm(id))}">${esc(nm(id))}</th>`+reach[i].map(v=>`<td>${v?'1':'0'}</td>`).join('')+'</tr>';});
+    h += '</table></div>';
   } else h += '<p>(Matrix แสดงเมื่อ |V| ≤ 30)</p>';
   return h;
 }
 function showAnalysis(){ openModal('🔍 ผลวิเคราะห์กราฟ', analysisHTML()); }
 
-/* ---------- Dijkstra ---------- */
-function runDijkstra(){
-  if(!G.nodes.length) return toast('ยังไม่มีจุดยอด');
-  const s = G.source, t = G.sink;
-  if(s == null || !nodeById(s)) return alertBox('กรุณาเลือก "ต้นทาง" ก่อนรัน Dijkstra');
-  const neg = G.edges.filter(e => e.w < 0);
-  if(neg.length) return openModal('⚠ พบน้ำหนักติดลบ', `<div class="hero bad">Dijkstra ใช้ไม่ได้กับน้ำหนักติดลบ<br>เส้นที่ติดลบ: ${neg.map(e => esc(edgeName(e))).join(', ')}</div>`);
-  const adj = outAdj(), dist = {}, prev = {}, prevE = {}, done = new Set(), steps = []; let relax = 0;
-  G.nodes.forEach(n => { dist[n.id] = Infinity; prev[n.id] = null; }); dist[s] = 0;
-  const base = () => { const ntext={}, node={}, edge={}; G.nodes.forEach(n => ntext[n.id] = fmt(dist[n.id])); done.forEach(id => node[id] = 'visited'); for(const k in prevE) edge[prevE[k]] = 'soft'; return {ntext, node, edge}; };
-  const snap = (m, ex) => steps.push(mkStep(m, base(), ex));
-  snap(`เริ่มต้น: d(${nm(s)}) = 0 และจุดอื่นทั้งหมด = ∞`, {node:{[s]:'current'}});
-  for(;;){
-    let u = null, best = Infinity;
-    for(const n of G.nodes) if(!done.has(n.id) && dist[n.id] < best){ best = dist[n.id]; u = n.id; }
-    if(u === null){ const rest = G.nodes.filter(n => !done.has(n.id)); if(rest.length) snap(`จุดที่เหลือ (${rest.map(n => n.label).join(', ')}) เข้าไม่ถึงจากต้นทาง → ระยะ = ∞`); break; }
-    done.add(u);
-    snap(`เลือก ${nm(u)} ซึ่งมีระยะน้อยที่สุด (${fmt(best)}) ในจุดที่ยังไม่ปิด → ปิดจุดนี้ (ระยะนี้คือคำตอบสุดท้ายแล้ว)`, {node:{[u]:'current'}});
-    for(const {to, w, e} of adj.get(u)){
-      if(done.has(to)) continue;
-      relax++;
-      const nd = dist[u]+w, old = dist[to];
-      if(nd < old){
-        dist[to] = nd; prev[to] = u; prevE[to] = e.id;
-        snap(`Relax ${nm(u)} → ${nm(to)}: ${fmt(dist[u])} + ${fmt(w)} = ${fmt(nd)} < ${fmt(old)} ✔ อัปเดต d(${nm(to)}) = ${fmt(nd)}`, {node:{[u]:'current', [to]:'consider'}, edge:{[e.id]:'consider'}});
-      } else {
-        snap(`Relax ${nm(u)} → ${nm(to)}: ${fmt(dist[u])} + ${fmt(w)} = ${fmt(nd)} ≥ ${fmt(old)} ✘ ไม่เปลี่ยน`, {node:{[u]:'current', [to]:'consider'}, edge:{[e.id]:'reject'}});
-      }
-    }
-  }
-  const pathTo = v => { if(dist[v] === Infinity) return null; const p = []; let x = v; while(x != null){ p.push(x); x = prev[x]; } return p.reverse(); };
-  const pathEdges = v => { const r = []; let x = v; while(prev[x] != null){ r.push(prevE[x]); x = prev[x]; } return r; };
-  const hasT = t != null && nodeById(t);
-  if(hasT){
-    const p = pathTo(t);
-    if(p) snap(`✔ เสร็จสิ้น! เส้นทางสั้นที่สุด: ${p.map(nm).join(' → ')} | ระยะรวม = ${fmt(dist[t])}`,
-      {node:Object.fromEntries(p.map(id => [id,'path'])), edge:Object.fromEntries(pathEdges(t).map(id => [id,'path']))});
-    else snap(`✘ เสร็จสิ้น: ไม่มีเส้นทางจาก ${nm(s)} ไป ${nm(t)} (ระยะ = ∞)`);
-  } else snap('✔ เสร็จสิ้น! ตัวเลขเหนือจุด = ระยะทางสั้นที่สุดจากต้นทาง (เลือก "ปลายทาง" เพื่อดูเส้นทาง)');
-  setRun({key:'dijkstra', title:'📊 สรุปผล Dijkstra — เส้นทางสั้นที่สุด', steps, summary:() => {
-    let h = '';
-    if(hasT){
-      const p = pathTo(t);
-      h += p ? `<div class="hero">🚚 ระยะทางสั้นที่สุดจาก <b>${esc(nm(s))}</b> ไป <b>${esc(nm(t))}</b> = <span class="bignum">${fmt(dist[t])}</span><div class="route">${p.map(id => `<span class="chip">${esc(nm(id))}</span>`).join(' → ')}</div></div>`
-             : `<div class="hero bad">✘ ไปไม่ถึง ${esc(nm(t))} จาก ${esc(nm(s))} (ระยะ = ∞)</div>`;
-    }
-    const reach = G.nodes.filter(n => dist[n.id] < Infinity).length;
-    h += `<div class="cards">${card('ต้นทาง', esc(nm(s)))}${card('ไปถึงได้', `${reach} / ${G.nodes.length} จุด`)}${card('จำนวนครั้ง Relax', relax)}${card('จำนวนขั้นตอน', steps.length)}</div>`;
-    h += '<h3>ระยะทางจากต้นทางไปทุกจุด</h3><div class="tw"><table class="tbl"><tr><th>จุดยอด</th><th>ระยะ</th><th>เส้นทาง</th></tr>';
-    [...G.nodes].sort((a,b) => cmpNum(dist[a.id], dist[b.id])).forEach(n => {
-      const p = pathTo(n.id);
-      h += `<tr><td class="l">${esc(n.label)}</td><td><b>${fmt(dist[n.id])}</b></td><td class="l">${p ? p.map(x => esc(nm(x))).join(' → ') : 'เข้าไม่ถึง'}</td></tr>`;
+/* ---------- Python algorithm API ---------- */
+async function runPythonAlgorithm(algorithm, extra = {}){
+  if(!G.nodes.length && algorithm !== 'havelhakimi') return toast('ยังไม่มีจุดยอด');
+  try{
+    const response = await fetch('/api/run', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        algorithm,
+        nodes:G.nodes.map(({id,label}) => ({id,label})),
+        edges:G.edges.map(({id,u,v,w}) => ({id,u,v,w})),
+        directed:G.directed,
+        source:G.source,
+        sink:G.sink,
+        colorNames:G.colorNames,
+        ...extra
+      })
     });
-    h += '</table></div>';
-    return h + appNote('ใช้หาเส้นทางขนส่งที่สั้นที่สุดหรือถูกที่สุดจากคลังสินค้าไปยังร้านค้า/ลูกค้า ถ้าน้ำหนักคือ "ค่าขนส่ง" ผลลัพธ์จะเป็นเส้นทางที่ประหยัดที่สุด');
-  }});
-}
-
-/* ---------- Prim ---------- */
-function runPrim(){
-  if(!G.nodes.length) return toast('ยังไม่มีจุดยอด');
-  const start = (G.source != null && nodeById(G.source)) ? G.source : G.nodes[0].id;
-  const inT = new Set(), tree = [], steps = [], roots = []; let total = 0, trees = 0;
-  const base = () => { const node={}, edge={}; inT.forEach(id => node[id] = 'visited'); tree.forEach(x => edge[x.e.id] = 'tree'); return {node, edge}; };
-  const snap = (m, ex) => steps.push(mkStep(m, base(), ex));
-  if(G.directed) snap('ℹ Prim ใช้กับกราฟไม่มีทิศทาง → ระบบจะมองทุกเส้นเป็นแบบไม่มีทิศ');
-  const order = [start, ...G.nodes.map(n => n.id).filter(id => id !== start)];
-  for(const root of order){
-    if(inT.has(root)) continue;
-    trees++; roots.push(root); inT.add(root);
-    snap(trees === 1 ? `เริ่มต้นที่ ${nm(root)} — ต้นไม้มี 1 จุด น้ำหนักรวม = 0`
-                     : `ไม่มีเส้นไปยังจุดที่เหลือแล้ว (กราฟไม่ Connected) → เริ่มต้นไม้ต้นที่ ${trees} ที่ ${nm(root)}`, {node:{[root]:'current'}});
-    for(;;){
-      const cand = G.edges.filter(e => e.u !== e.v && inT.has(e.u) !== inT.has(e.v));
-      if(!cand.length) break;
-      let best = cand[0]; for(const e of cand) if(e.w < best.w) best = e;
-      const ed = {}; cand.forEach(e => ed[e.id] = 'consider');
-      const list = [...cand].sort((a,b) => a.w-b.w).slice(0,6).map(e => `${nm(e.u)}–${nm(e.v)} (${fmt(e.w)})`).join(', ') + (cand.length > 6 ? ', ...' : '');
-      snap(`ตัวเลือก ${cand.length} เส้นที่เชื่อมต้นไม้กับจุดใหม่: ${list}`, {edge:ed});
-      const nv = inT.has(best.u) ? best.v : best.u;
-      inT.add(nv); total += best.w; tree.push({e:best, tree:trees, total});
-      snap(`✔ เลือกเส้นต้นทุนต่ำสุด ${nm(best.u)}–${nm(best.v)} = ${fmt(best.w)} → เพิ่ม ${nm(nv)} | น้ำหนักรวม = ${fmt(total)}`, {node:{[nv]:'current'}, edge:{[best.id]:'path'}});
+    const result = await response.json();
+    if(!response.ok) throw new Error(result.error || `HTTP ${response.status}`);
+    if(result.key === 'pruferDecode' || result.key === 'graphTransform' || (result.key === 'degreeSequence' && result.exists)){
+      pushUndo();
+      const center = toWorld(W/2, H/2), radius = Math.max(90, result.nodes.length * 18);
+      G = emptyGraph();
+      G.directed = !!result.directed;
+      G.nodes = result.nodes.map((node, index) => {
+        const angle = 2*Math.PI*index/result.nodes.length - Math.PI/2;
+        return {...node, x:center.x+radius*Math.cos(angle), y:center.y+radius*Math.sin(angle), color:null};
+      });
+      G.edges = result.edges.map(edge => ({...edge, curve:0, color:null}));
+      G.nextId = G.nodes.length + 1;
+      G.nextEid = G.edges.length + 1;
+      afterChange();
+      fitView();
+    } else if(result.key === 'color'){
+      pushUndo();
+      G.nodes.forEach(n => { n.color = result.colors[n.id] ?? null; });
+      save();
+    } else if(result.key === 'edgeColor'){
+      pushUndo();
+      G.edges.forEach(edge => { edge.color = result.colors[edge.id] ?? null; });
+      save();
+    } else if(result.key === 'bipartite' && result.isBipartite){
+      pushUndo();
+      G.nodes.forEach(node => { node.color = result.colors[node.id] ?? null; });
+      save();
+    } else if(result.key === 'isomorphism'){
+      displayIsomorphismComparison(extra.otherGraph, result);
     }
-  }
-  snap(trees === 1 ? `✔ เสร็จสิ้น! Minimum Spanning Tree มี ${tree.length} เส้น น้ำหนักรวม = ${fmt(total)}`
-                   : `✔ เสร็จสิ้น! ได้ Spanning Forest ${trees} ต้น (${tree.length} เส้น) น้ำหนักรวม = ${fmt(total)}`);
-  setRun({key:'prim', title:'📊 สรุปผล Prim — Minimum Spanning Tree', steps, summary:() => {
-    let h = `<div class="hero ${trees>1?'warn':''}">🌳 ${trees===1?'Minimum Spanning Tree':'Spanning Forest ('+trees+' ต้น)'} น้ำหนักรวมต่ำสุด = <span class="bignum">${fmt(total)}</span></div>`;
-    h += `<div class="cards">${card('จุดเริ่ม', esc(nm(start)))}${card('จำนวนเส้นที่ใช้', `${tree.length} (= |V| − ${trees})`)}${card('จำนวนต้นไม้', trees)}${card('เส้นที่ไม่ใช้', G.edges.length-tree.length)}</div>`;
-    if(trees > 1) h += `<p>⚠ กราฟไม่ Connected จึงได้ป่า (Forest) — เริ่มแต่ละต้นที่: ${roots.map(r => `<span class="chip">${esc(nm(r))}</span>`).join('')}</p>`;
-    h += '<h3>ลำดับเส้นที่เลือก</h3><div class="tw"><table class="tbl"><tr><th>#</th><th>ต้นที่</th><th>เส้น</th><th>น้ำหนัก</th><th>รวมสะสม</th></tr>';
-    tree.forEach((x,i) => { h += `<tr><td>${i+1}</td><td>${x.tree}</td><td class="l">${esc(nm(x.e.u))} – ${esc(nm(x.e.v))}</td><td>${fmt(x.e.w)}</td><td><b>${fmt(x.total)}</b></td></tr>`; });
-    h += '</table></div>';
-    return h + appNote('วางโครงข่ายถนน ท่อประปา หรือสายไฟให้ทุกจุดเชื่อมถึงกัน โดยใช้งบประมาณรวมน้อยที่สุด');
-  }});
-}
-
-/* ---------- Coloring ---------- */
-function exactChromatic(ids, nb){
-  const n = ids.length; if(!n) return {k:0, col:new Map()};
-  const order = [...ids].sort((a,b) => nb.get(b).size-nb.get(a).size), col = new Map();
-  const ok = (v,c) => { for(const u of nb.get(v)) if(col.get(u) === c) return false; return true; };
-  const bt = (i,k,used) => {
-    if(i === n) return true;
-    const v = order[i];
-    for(let c=0; c<Math.min(k, used+1); c++){ if(ok(v,c)){ col.set(v,c); if(bt(i+1, k, Math.max(used, c+1))) return true; col.delete(v); } }
-    return false;
-  };
-  for(let k=1; k<=n; k++){ col.clear(); if(bt(0,k,0)) return {k, col:new Map(col)}; }
-  return {k:n, col};
-}
-function runColoring(){
-  if(!G.nodes.length) return toast('ยังไม่มีจุดยอด');
-  const nb = nbrSets(), deg = id => nb.get(id).size;
-  const order = [...G.nodes].sort((a,b) => deg(b.id)-deg(a.id) || a.id-b.id).map(n => n.id);
-  const col = {}, steps = []; let c = 0, cnt = 0;
-  const base = () => ({fill:{...col}});
-  const snap = (m, ex) => steps.push(mkStep(m, base(), ex));
-  snap(`Welsh–Powell: เรียงจุดตาม Degree มาก→น้อย: ${order.map(id => `${nm(id)}(${deg(id)})`).join(', ')}`);
-  while(cnt < order.length){
-    snap(`🎨 เริ่มใช้สีที่ ${c+1} "${cName(c)}" — ไล่ตามลำดับ ใส่สีให้จุดที่ไม่ติดกับจุดสีนี้`);
-    for(const id of order){
-      if(col[id] !== undefined) continue;
-      let conflict = null; for(const x of nb.get(id)) if(col[x] === c){ conflict = x; break; }
-      if(conflict === null){ col[id] = c; cnt++; snap(`${nm(id)} ไม่ติดกับจุดที่ใช้ "${cName(c)}" → ระบายสีนี้`, {node:{[id]:'current'}}); }
-      else {
-        const e = G.edges.find(x => (x.u === id && x.v === conflict) || (x.v === id && x.u === conflict));
-        snap(`${nm(id)} ติดกับ ${nm(conflict)} ที่ใช้ "${cName(c)}" แล้ว → ข้ามไปก่อน`, {node:{[id]:'current'}, edge:e ? {[e.id]:'consider'} : {}});
-      }
-    }
-    c++;
-  }
-  const k = c, Delta = Math.max(0, ...G.nodes.map(n => deg(n.id)));
-  const exact = G.nodes.length <= 15 ? exactChromatic(order, nb) : null;
-  snap(`✔ เสร็จสิ้น! Greedy ใช้ ${k} สี (ขอบเขตบน Δ+1 = ${Delta+1})` + (exact ? ` | Chromatic Number χ(G) = ${exact.k}` : ''));
-  pushUndo(); G.nodes.forEach(n => n.color = col[n.id]); save();
-  setRun({key:'color', title:'📊 สรุปผล Graph Coloring', steps, summary:() => {
-    let h = `<div class="hero">🎨 Welsh–Powell ใช้ <span class="bignum">${k}</span> สี${exact ? ` • ค่าที่ดีที่สุดจริง χ(G) = <b>${exact.k}</b>` : ''}</div>`;
-    h += `<div class="cards">${card('Greedy (Welsh–Powell)', k+' สี')}${card('Δ (Degree สูงสุด)', Delta)}${card('ขอบเขตบน Δ+1', Delta+1)}${card('χ(G) แบบ Exact', exact ? exact.k : 'คำนวณเมื่อ |V| ≤ 15')}</div>`;
-    if(exact) h += exact.k < k ? `<p>⚠ Greedy ใช้สีมากกว่าค่าที่ดีที่สุด ${k-exact.k} สี (Greedy ไม่รับประกันว่าน้อยที่สุดเสมอ)</p>` : '<p>✔ Greedy ได้จำนวนสีเท่ากับค่าที่ดีที่สุด</p>';
-    h += '<h3>กลุ่มของแต่ละสี (กดตั้งชื่อความหมายได้)</h3>';
-    for(let i=0; i<k; i++){
-      const mem = G.nodes.filter(n => col[n.id] === i);
-      h += `<div class="grp"><div class="gh"><span><span class="sw" style="background:${PALETTE[i%PALETTE.length]}"></span>${esc(cName(i))} <small>(${mem.length} จุด)</small></span><button type="button" class="btn mini" data-cname="${i}">✏️ ตั้งชื่อ</button></div>${mem.map(n => `<span class="chip">${esc(n.label)}</span>`).join('')}</div>`;
-    }
-    h += '<h3>ลำดับ Welsh–Powell</h3><div class="tw"><table class="tbl"><tr><th>#</th><th>จุด</th><th>deg</th><th>สี</th></tr>';
-    order.forEach((id,i) => { h += `<tr><td>${i+1}</td><td class="l">${esc(nm(id))}</td><td>${deg(id)}</td><td class="l"><span class="sw" style="background:${PALETTE[col[id]%PALETTE.length]}"></span>${esc(cName(col[id]))}</td></tr>`; });
-    h += '</table></div>';
-    return h + appNote('จุดที่เชื่อมกัน = ขัดแย้งกัน (เช่น วิชาที่มีนักเรียนสอบซ้อน หรือสินค้าที่ห้ามเก็บรวมกัน) จึงต้องได้สีต่างกัน แต่ละสีจึงหมายถึงช่วงเวลาสอบหรือช่องจัดเก็บ 1 ช่อง จำนวนสีจึงเท่ากับจำนวนช่วงเวลาหรือช่องที่ต้องใช้');
-  }});
-}
-
-/* ---------- Network Flow (Edmonds–Karp) ---------- */
-function runFlow(){
-  const s = G.source, t = G.sink;
-  if(s == null || t == null || !nodeById(s) || !nodeById(t)) return alertBox('กรุณาเลือก Source และ Sink ก่อนรัน Max Flow');
-  if(s === t) return alertBox('Source และ Sink ต้องเป็นคนละจุด');
-  const g = new Map(G.nodes.map(n => [n.id, []])), arcs = [];
-  const addArc = (u,v,cap,eid,sign) => { const a = {to:v, cap, flow:0, eid, sign}, b = {to:u, cap:0, flow:0, eid:null, sign:0}; a.rev = b; b.rev = a; g.get(u).push(a); g.get(v).push(b); arcs.push(a); };
-  G.edges.forEach(e => { if(e.u === e.v) return; addArc(e.u, e.v, e.w, e.id, 1); if(!G.directed) addArc(e.v, e.u, e.w, e.id, -1); });
-  const flowOf = () => { const f = {}; G.edges.forEach(e => f[e.id] = 0); arcs.forEach(a => f[a.eid] += a.sign*a.flow); return f; };
-  const steps = [], aug = []; let total = 0;
-  const base = () => { const f = flowOf(), etext = {}, edge = {}; G.edges.forEach(e => { const v = Math.abs(f[e.id]); etext[e.id] = `${fmt(v)}/${fmt(e.w)}`; if(v > EPS) edge[e.id] = v >= e.w-EPS ? 'sat' : 'flow'; }); return {etext, edge}; };
-  const snap = (m, ex) => steps.push(mkStep(m, base(), ex));
-  snap(`เริ่มต้น: Flow ทุกเส้น = 0 (แสดงเป็น flow/capacity) | Source = ${nm(s)}, Sink = ${nm(t)}` + (G.directed ? '' : ' | ⚠ กราฟไม่มีทิศ: แต่ละเส้นไหลได้ 2 ทาง'), {node:{[s]:'current', [t]:'current'}});
-  for(let it=1; it<=10000; it++){
-    const par = new Map([[s, null]]), q = [s];
-    while(q.length && !par.has(t)){ const u = q.shift(); for(const a of g.get(u)) if(a.cap-a.flow > EPS && !par.has(a.to)){ par.set(a.to, {u, a}); q.push(a.to); } }
-    if(!par.has(t)) break;
-    const pa = [], pn = [t]; let v = t, b = Infinity;
-    while(v !== s){ const {u, a} = par.get(v); pa.push(a); b = Math.min(b, a.cap-a.flow); v = u; pn.push(u); }
-    pa.reverse(); pn.reverse();
-    const ed = {}, nd = {}; pa.forEach(a => ed[a.eid != null ? a.eid : a.rev.eid] = 'consider'); pn.forEach(id => nd[id] = 'consider');
-    const back = pa.some(a => a.eid == null);
-    snap(`รอบ ${it}: BFS พบ Augmenting Path ${pn.map(nm).join(' → ')} | คอขวดของเส้นทาง = ${fmt(b)}` + (back ? ' (มีการดันกระแสย้อนกลับผ่าน residual edge)' : ''), {edge:ed, node:nd});
-    pa.forEach(a => { a.flow += b; a.rev.flow -= b; });
-    total += b; aug.push({nodes:pn, b, back});
-    snap(`เพิ่ม Flow +${fmt(b)} ตามเส้นทางนี้ → Flow รวม = ${fmt(total)}`, {edge:Object.fromEntries(Object.keys(ed).map(k => [k, 'path'])), node:nd});
-  }
-  const S = new Set([s]), q2 = [s];
-  while(q2.length){ const u = q2.shift(); for(const a of g.get(u)) if(a.cap-a.flow > EPS && !S.has(a.to)){ S.add(a.to); q2.push(a.to); } }
-  const cut = G.edges.filter(e => (S.has(e.u) && !S.has(e.v)) || (!G.directed && S.has(e.v) && !S.has(e.u)));
-  const cutCap = cut.reduce((x,e) => x+e.w, 0);
-  snap(`ไม่พบ Augmenting Path อีกแล้ว → Max Flow = ${fmt(total)}`);
-  const ns = {}; S.forEach(id => ns[id] = 'inS'); const ce = {}; cut.forEach(e => ce[e.id] = 'cut');
-  snap(`✔ Min Cut: ฝั่ง S = {${[...S].map(nm).join(', ')}} | เส้นคอขวด: ${cut.map(edgeName).join(', ') || '-'} | ความจุรวม = ${fmt(cutCap)} = Max Flow`, {node:ns, edge:ce});
-  const finalF = flowOf(), cutIds = new Set(cut.map(e => e.id));
-  setRun({key:'flow', title:'📊 สรุปผล Max Flow (Edmonds–Karp)', steps, summary:() => {
-    let h = `<div class="hero">🚰 ปริมาณไหลสูงสุดจาก <b>${esc(nm(s))}</b> ไป <b>${esc(nm(t))}</b> = <span class="bignum">${fmt(total)}</span></div>`;
-    h += `<div class="cards">${card('จำนวนรอบ Augment', aug.length)}${card('ความจุ Min Cut', fmt(cutCap))}${card('เส้นคอขวด', cut.length+' เส้น')}${card('Max Flow = Min Cut', fmt(total)===fmt(cutCap)?'✔ จริง':'✘')}</div>`;
-    h += '<h3>🔴 เส้นคอขวด (Min Cut)</h3>' + (cut.length ? cut.map(e => `<span class="chip" style="background:#ffd6d6">${esc(edgeName(e))} (${fmt(e.w)})</span>`).join('') : '<p>-</p>');
-    h += `<p style="font-size:14px">ฝั่ง S: ${[...S].map(id => `<span class="chip">${esc(nm(id))}</span>`).join('')}<br>ฝั่ง T: ${G.nodes.filter(n => !S.has(n.id)).map(n => `<span class="chip">${esc(n.label)}</span>`).join('')}</p>`;
-    h += '<h3>Augmenting Paths ทีละรอบ</h3><div class="tw"><table class="tbl"><tr><th>รอบ</th><th>เส้นทาง</th><th>เพิ่ม</th></tr>';
-    aug.forEach((a,i) => { h += `<tr><td>${i+1}</td><td class="l">${a.nodes.map(x => esc(nm(x))).join(' → ')}${a.back?' ↺':''}</td><td><b>+${fmt(a.b)}</b></td></tr>`; });
-    h += '</table></div><h3>Flow บนแต่ละเส้น</h3><div class="tw"><table class="tbl"><tr><th>เส้น</th><th>Flow / Capacity</th><th>สถานะ</th></tr>';
-    G.edges.forEach(e => {
-      const f = finalF[e.id], v = Math.abs(f);
-      const dir = !G.directed && v > EPS ? (f > 0 ? ` (${esc(nm(e.u))}→${esc(nm(e.v))})` : ` (${esc(nm(e.v))}→${esc(nm(e.u))})`) : '';
-      const stt = cutIds.has(e.id) ? '🔴 คอขวด (เต็ม)' : (v >= e.w-EPS && e.w > 0 ? '🟣 เต็ม' : `เหลือ ${fmt(e.w-v)}`);
-      h += `<tr><td class="l">${esc(edgeName(e))}${dir}</td><td><b>${fmt(v)}/${fmt(e.w)}</b></td><td class="l">${stt}</td></tr>`;
+    setRun({
+      key:result.key,
+      title:result.title,
+      steps:result.steps,
+      summary:() => result.summary.replace(/\{\{COLOR_NAME_(\d+)\}\}/g, (_, i) => esc(cName(+i))) +
+        (result.key === 'isomorphism' && result.isomorphic ? isomorphismMappingSummary() : '')
     });
-    h += '</table></div>';
-    return h + appNote('ใช้ประเมินปริมาณสินค้าหรือการจราจรสูงสุดที่โครงข่ายรองรับได้ เส้นคอขวด (Min Cut) คือจุดที่ควรขยายก่อน เพราะถ้าเพิ่มความจุเส้นเหล่านี้ Max Flow จึงจะเพิ่มขึ้นได้');
-  }});
+  }catch(error){
+    console.error('Python algorithm request failed:', error);
+    toast(`รันอัลกอริทึมไม่สำเร็จ: ${error.message}`);
+  }
+}
+function displayIsomorphismComparison(otherGraph,result){
+  isoGraph = JSON.parse(JSON.stringify(otherGraph));
+  const nodeCount=isoGraph.nodes.length, radius=Math.min(240,Math.max(90,nodeCount*24));
+  isoGraph.nodes=isoGraph.nodes.map((node,index)=>{
+    const angle=2*Math.PI*index/nodeCount-Math.PI/2;
+    return {...node,x:400+radius*Math.cos(angle),y:300+radius*Math.sin(angle),color:null};
+  });
+  isoGraph.nextId=Math.max(1,...isoGraph.nodes.map(node=>node.id+1));
+  isoGraph.nextEid=Math.max(1,...isoGraph.edges.map(edge=>edge.id+1));
+  isoFirstGraph=JSON.parse(JSON.stringify(G));
+  isoMapping=result.isomorphic ? result.mapping : null;
+  isoColors=[];
+  $('#isoMappingLegend').replaceChildren();
+  if(isoMapping){
+    const leftById=new Map(isoFirstGraph.nodes.map(node=>[String(node.id),node]));
+    const rightById=new Map(isoGraph.nodes.map(node=>[String(node.id),node]));
+    const colorByLeft=new Map();
+    for(const [index,[leftId,rightId]] of Object.entries(isoMapping).entries()){
+      const left=leftById.get(String(leftId)),right=rightById.get(String(rightId));
+      if(!left||!right) continue;
+      const colorIndex=index%PALETTE.length,color=PALETTE[colorIndex];
+      left.color=colorIndex;right.color=colorIndex;colorByLeft.set(String(leftId),colorIndex);
+      isoColors.push({leftId:String(leftId),rightId:String(rightId),leftLabel:left.label,rightLabel:right.label,color});
+    }
+    const rightEdgeByPair=new Map();
+    const pairKey=(u,v)=>isoGraph.directed?`${u}>${v}`:`${Math.min(u,v)}-${Math.max(u,v)}`;
+    isoGraph.edges.forEach(edge=>rightEdgeByPair.set(pairKey(edge.u,edge.v),edge));
+    for(const edge of isoFirstGraph.edges){
+      const mappedU=isoMapping[String(edge.u)],mappedV=isoMapping[String(edge.v)];
+      const matching=rightEdgeByPair.get(pairKey(mappedU,mappedV));
+      if(!matching) continue;
+      const edgeColor=colorByLeft.get(String(edge.u)) ?? 0;
+      edge.color=edgeColor;matching.color=edgeColor;
+    }
+    $('#isoMappingLegend').innerHTML=isoColors.map(pair=>
+      `<span class="iso-pair-chip"><i style="background:${pair.color}"></i>${esc(pair.leftLabel)} → ${esc(pair.rightLabel)}</span>`
+    ).join('');
+    $('#isoMappingLegend').classList.add('visible');
+    $('#isoRightStatus').textContent='Isomorphic ✓ สีเดียวกันแสดงคู่จุดยอดที่ตรงกัน';
+  }else{
+    $('#isoMappingLegend').classList.remove('visible');
+    $('#isoRightStatus').textContent='ไม่ Isomorphic — ไม่พบการจับคู่ที่รักษาเส้นเชื่อม';
+  }
+  const stageRect=$('#stage').getBoundingClientRect();
+  isoView=fitGraphView(isoGraph,Math.max(1,stageRect.width-W),H);
+  draw();
+}
+function invalidateIsomorphismResult(){
+  if(!isoFirstGraph&&!isoMapping&&!isoColors.length)return;
+  clearRun();
+  isoFirstGraph=null;isoMapping=null;isoColors=[];
+  if(isoGraph){
+    isoGraph.nodes.forEach(node=>{if(node.color!=null)node.color=null;});
+    isoGraph.edges.forEach(edge=>{if(edge.color!=null)edge.color=null;});
+  }
+  const legend=$('#isoMappingLegend');
+  if(legend){legend.replaceChildren();legend.classList.remove('visible');}
+  const status=$('#isoRightStatus');
+  if(status)status.textContent=`กราฟที่สองมี ${isoGraph?isoGraph.nodes.length:0} จุด • ${isoGraph?isoGraph.edges.length:0} เส้น — แก้ไขได้ด้วยเครื่องมือด้านบน`;
+}
+function isomorphismMappingSummary(){
+  if(!isoColors.length) return '';
+  const rows=isoColors.map(pair=>
+    `<tr><td><span class="sw" style="background:${pair.color}"></span>${esc(pair.leftLabel)}</td><td>→</td><td><span class="sw" style="background:${pair.color}"></span>${esc(pair.rightLabel)}</td></tr>`
+  ).join('');
+  return `<h3>จุดยอดที่จับคู่กัน</h3><div class="tw"><table class="tbl"><tr><th>กราฟที่ 1</th><th></th><th>กราฟที่ 2</th></tr>${rows}</table></div>`;
+}
+function runDijkstra(){ return runPythonAlgorithm('dijkstra'); }
+function runPrim(){ return runPythonAlgorithm('prim'); }
+function runKruskal(){ return runPythonAlgorithm('kruskal'); }
+function runEuler(){ return runPythonAlgorithm('euler'); }
+function runEdgeColoring(){ return runPythonAlgorithm('edgecolor'); }
+function runColoring(){ return runPythonAlgorithm('color'); }
+function runFlow(){ return runPythonAlgorithm('flow'); }
+function runHamiltonian(){ return runPythonAlgorithm('hamiltonian'); }
+function runPlanarity(){ return runPythonAlgorithm('planarity'); }
+function runVertexConnectivity(){ return runPythonAlgorithm('vertexconnectivity'); }
+function runEdgeConnectivity(){ return runPythonAlgorithm('edgeconnectivity'); }
+function showDegreeSequenceInput(){
+  openModal('📊 Degree Sequence', `
+    <p>ใส่ Degree ของแต่ละจุดยอด คั่นด้วยช่องว่างหรือจุลภาค เช่น <b>3, 2, 2, 1</b></p>
+    <label>Degree Sequence
+      <input id="degreeSequenceInput" type="text" inputmode="numeric" autocomplete="off" placeholder="เช่น 3, 2, 2, 1">
+    </label>
+    <p><button type="button" class="btn primary" id="buildDegreeSequence">ตรวจสอบและสร้างกราฟ</button></p>
+    <p class="note">ใช้ Havel–Hakimi และ Erdős–Gallai ตรวจว่าลำดับนี้สร้างเป็นกราฟอย่างง่ายได้หรือไม่ (1–500 จุดยอด)</p>`);
+  $('#degreeSequenceInput').focus();
+}
+function runDegreeSequenceFromInput(){
+  const raw = $('#degreeSequenceInput').value.trim();
+  if(!raw) return toast('กรุณาใส่ Degree Sequence');
+  const tokens = raw.split(/[,\s]+/);
+  if(tokens.some(token => !/^\d+$/.test(token))) return toast('Degree ต้องเป็นจำนวนเต็มไม่ติดลบ คั่นด้วยช่องว่างหรือจุลภาค');
+  const degreeSequence = tokens.map(Number);
+  if(degreeSequence.some(value => !Number.isSafeInteger(value))) return toast('มี Degree ที่มีค่ามากเกินไป');
+  closeModal();
+  return runPythonAlgorithm('havelhakimi', {degreeSequence});
+}
+function runComplement(){ return runPythonAlgorithm('transform', {operation:'complement'}); }
+function runBipartite(){ return runPythonAlgorithm('bipartite'); }
+function showIsomorphismInput(){
+  const presetOptions = Object.entries(PRESETS)
+    .map(([key, preset]) => `<option value="${key}">${esc(preset.name)}</option>`).join('');
+  const drawnOption=isoGraph&&isoGraph.nodes.length?`<option value="drawn" selected>ใช้กราฟที่วาดไว้ทางขวา (${isoGraph.nodes.length} จุด, ${isoGraph.edges.length} เส้น)</option>`:'';
+  openModal('🔁 Isomorphic Graphs', `<p>สร้างหรือแก้กราฟได้ทั้งสองฝั่ง แล้วเลือกเปรียบเทียบกราฟที่วาดไว้ทางขวา หรือนำเข้าตัวอย่าง/Edge List</p>
+    <div class="row"><label class="sel">กราฟที่สอง<select id="isoPreset">${drawnOption}<option value="custom" ${drawnOption?'':'selected'}>กำหนดด้วย Edge List</option>${presetOptions}</select></label></div>
+    <div class="row"><label class="sel">จำนวนจุดยอดของกราฟที่สอง <input id="isoNodeCount" type="number" min="1" max="12" value="${Math.max(1, G.nodes.length)}"></label></div>
+    <label>Edge List <textarea id="isoEdges" rows="3" placeholder="${G.directed ? 'ตัวอย่างกราฟมีทิศทาง: 1&gt;2, 2&gt;3' : 'ตัวอย่างกราฟไม่มีทิศทาง: 1-2, 2-3'}"></textarea></label>
+    <label><input id="isoDirected" type="checkbox" ${G.directed ? 'checked' : ''}> กราฟที่สองมีทิศทาง</label>
+    <p class="note">เปรียบเทียบโครงสร้างโดยไม่สนชื่อจุดยอดหรือน้ำหนัก รองรับกราฟอย่างง่ายไม่เกิน 12 จุดยอด (ไม่มี self-loop/เส้นขนาน)</p>
+    <p><button type="button" class="btn primary" id="runIsomorphismCompare">เปรียบเทียบกราฟ</button></p>`);
+}
+function runIsomorphismComparison(){
+  let otherGraph;
+  const presetKey = $('#isoPreset').value;
+  if(presetKey==='drawn'){
+    if(!isoGraph||!isoGraph.nodes.length)return toast('เพิ่มจุดยอดทางฝั่งขวาก่อนเปรียบเทียบ');
+    otherGraph={
+      nodes:isoGraph.nodes.map(({id,label})=>({id,label})),
+      edges:isoGraph.edges.map(({id,u,v,w})=>({id,u,v,w})),
+      directed:isoGraph.directed
+    };
+  }else if(presetKey !== 'custom'){
+    const preset = PRESETS[presetKey];
+    if(!preset) return toast('ไม่พบตัวอย่างกราฟที่เลือก');
+    const graph = preset.build();
+    otherGraph = {
+      nodes:graph.nodes.map(({id,label}) => ({id,label})),
+      edges:graph.edges.map(({id,u,v,w}) => ({id,u,v,w})),
+      directed:graph.directed
+    };
+  }else{
+    const count = Number($('#isoNodeCount').value), directed = $('#isoDirected').checked;
+    if(!Number.isInteger(count) || count < 1 || count > 12) return toast('กราฟที่สองต้องมี 1–12 จุดยอด');
+    const raw = $('#isoEdges').value.trim();
+    const pairs = raw ? raw.split(/[;,\n]+/).map(item => item.trim()) : [];
+    const edges = [], seen = new Set();
+    for(const pair of pairs){
+      const match = directed ? pair.match(/^(\d+)\s*(?:>|→)\s*(\d+)$/) : pair.match(/^(\d+)\s*-\s*(\d+)$/);
+      if(!match) return toast(`รูปแบบ Edge List ไม่ถูกต้อง: ${pair}`);
+      const u = Number(match[1]), v = Number(match[2]);
+      if(u < 1 || u > count || v < 1 || v > count || u === v) return toast(`เส้น ${pair} ต้องเชื่อมจุด 1–${count} และห้ามเป็น self-loop`);
+      const key = directed ? `${u}>${v}` : `${Math.min(u,v)}-${Math.max(u,v)}`;
+      if(seen.has(key)) return toast(`พบเส้นซ้ำ: ${pair}`);
+      seen.add(key); edges.push({id:edges.length+1,u,v,w:1});
+    }
+    otherGraph = {
+      nodes:Array.from({length:count},(_,index)=>({id:index+1,label:`v${index+1}`})),
+      edges,
+      directed
+    };
+    isoGraph=sanitize({
+      nodes:otherGraph.nodes.map(node=>({...node,x:100+((node.id-1)%4)*90,y:100+Math.floor((node.id-1)/4)*90,color:null})),
+      edges:otherGraph.edges.map(edge=>({...edge,color:null,curve:0})),
+      directed,nextId:count+1,nextEid:edges.length+1
+    });
+  }
+  closeModal();
+  return runPythonAlgorithm('isomorphism', {otherGraph});
 }
 
 /* ---------- player ---------- */
@@ -853,18 +1287,52 @@ const TABS = {
   analyze:{icon:'🔍', name:'วิเคราะห์', desc:'ดูภาพรวมของกราฟ: |V|, |E|, Degree, Σdeg = 2|E|, Connected/Components, ตรวจน้ำหนักติดลบ, Adjacency & Weight Matrix', s:null, t:null, run:() => showAnalysis()},
   dijkstra:{icon:'🛣️', name:'Dijkstra', desc:'หาเส้นทางสั้นที่สุดจากต้นทางไปทุกจุด โดยใช้น้ำหนักเป็นระยะทางหรือค่าขนส่ง', app:'เส้นทางขนส่งที่สั้น/ถูกที่สุด', s:'🚩 ต้นทาง', t:'🏁 ปลายทาง', run:runDijkstra},
   prim:{icon:'🌳', name:'Prim (MST)', desc:'สร้าง Spanning Tree ที่น้ำหนักรวมน้อยที่สุด โดยเพิ่มเส้นที่ถูกที่สุดทีละเส้น', app:'วางถนน/ท่อ/สายไฟให้ต้นทุนรวมต่ำสุด', s:'🚩 จุดเริ่ม', t:null, run:runPrim},
-  color:{icon:'🎨', name:'Coloring', desc:'ระบายสีแบบ Welsh–Powell: จุดที่เชื่อมกัน (ขัดแย้งกัน) ต้องได้สีต่างกัน (ไม่สนน้ำหนักเส้น)', app:'จัดตารางสอบ/ช่องเก็บสินค้าไม่ให้ชนกัน', s:null, t:null, run:runColoring},
+  kruskal:{icon:'🌲', name:'Kruskal (MST)', desc:'เลือกเส้นน้ำหนักน้อยที่สุดทีละเส้น โดยข้ามเส้นที่จะทำให้เกิดวงจร และแสดง Spanning Forest เมื่อกราฟไม่เชื่อมต่อ', s:null, t:null, run:runKruskal},
+  euler:{icon:'🔁', name:'Euler Path/Circuit', desc:'ตรวจเงื่อนไข degree และใช้ Hierholzer หาเส้นทางที่ผ่านทุกเส้นครั้งเดียว รองรับกราฟมีทิศและเส้นขนาน', s:null, t:null, run:runEuler},
+  bipartite:{icon:'◐', name:'Bipartite Graph', desc:'ตรวจว่าสามารถแบ่งจุดยอดเป็นสองฝั่งโดยทุกเส้นเชื่อมข้ามฝั่งหรือไม่ พร้อมแสดง partition และระบายสีจุดยอด', s:null, t:null, run:runBipartite},
+  isomorphism:{icon:'🔁', name:'Isomorphic Graphs', desc:'เปรียบเทียบกราฟปัจจุบันกับอีกกราฟ แล้วแสดง mapping ของจุดยอดเมื่อมีโครงสร้างเหมือนกัน (กราฟอย่างง่ายไม่เกิน 12 จุด)', s:null, t:null, run:showIsomorphismInput},
+  hamiltonian:{icon:'🧭', name:'Hamiltonian Path / Cycle', desc:'ค้นหา Hamiltonian Path และ Hamiltonian Cycle ด้วย Backtracking (ไม่เกิน 15 จุด) พร้อมเงื่อนไข Dirac/Ore', s:null, t:null, run:runHamiltonian},
+  planarity:{icon:'📐', name:'Planarity / Kuratowski', desc:'ตรวจเกณฑ์ Euler และค้นหา K₅ / K₃,₃ minors ด้วยการลบจุดและหดเส้น (exact สูงสุด 10 จุดยอด; อาจรายงานว่าสรุปไม่ได้เมื่อค้นหาเกินขีดจำกัด)', s:null, t:null, run:runPlanarity},
+  vertexconnectivity:{icon:'🔗', name:'Vertex Connectivity κ(G)', desc:'คำนวณจำนวนจุดยอดน้อยที่สุดที่ต้องตัดให้กราฟไม่เชื่อมต่อ พร้อมระบุชื่อจุดที่ต้องตัด', s:null, t:null, run:runVertexConnectivity},
+  edgeconnectivity:{icon:'✂️', name:'Edge Connectivity λ(G)', desc:'คำนวณจำนวนเส้นเชื่อมน้อยที่สุดที่ต้องตัดให้กราฟไม่เชื่อมต่อ พร้อมระบุเส้นที่ต้องตัด', s:null, t:null, run:runEdgeConnectivity},
+  degreeSequence:{icon:'🧮', name:'Degree Sequence', desc:'ตรวจด้วย Havel–Hakimi / Erdős–Gallai และสร้างกราฟอย่างง่ายจากลำดับ Degree ที่เป็นไปได้', s:null, t:null, run:showDegreeSequenceInput},
+  complement:{icon:'◐', name:'Complement', desc:'สร้างกราฟเติมเต็ม โดยเชื่อมคู่จุดยอดที่ยังไม่มีเส้นเชื่อม (กราฟไม่มีทิศทางและไม่มีเส้นซ้ำ/loop)', s:null, t:null, run:runComplement},
+  edgeColor:{icon:'🎨', name:'Edge Coloring', desc:'ระบายสีเส้นแบบ Greedy โดยเส้นที่มีจุดร่วมต้องคนละสี; สีแบบอัตโนมัติเป็นค่าประมาณ', s:null, t:null, run:runEdgeColoring},
+  color:{icon:'🎨', name:'Vertex Coloring χ(G)', desc:'ระบายสีจุดแบบ Welsh–Powell พร้อมคำนวณ Chromatic Number แบบ Exact เมื่อมีไม่เกิน 15 จุด; ใช้กับตารางสอบ/แข่งขัน', app:'จุดที่เชื่อมกันต้องใช้สี/ช่วงเวลาต่างกัน; กราฟเชิงระนาบใช้ไม่เกิน 4 สีตามทฤษฎีบทสี่สี', s:null, t:null, run:runColoring},
   flow:{icon:'🚰', name:'Max Flow', desc:'Edmonds–Karp: หา Augmenting Path ด้วย BFS ซ้ำจนไหลเพิ่มไม่ได้ ใช้น้ำหนักเป็นความจุ (Capacity) ควรใช้กราฟแบบมีทิศ', app:'ปริมาณสินค้า/การจราจรสูงสุด และจุดคอขวด', s:'🟢 Source', t:'🔴 Sink', run:runFlow}
 };
 const LEGENDS = {
   analyze:'',
   dijkstra:'<span class="lg"><i style="background:#ffcd75"></i>กำลังปิดจุด</span><span class="lg"><i style="background:#ef7d57"></i>กำลัง Relax</span><span class="lg"><i style="background:#a7f070"></i>ปิดแล้ว</span><span class="lg"><i class="ln" style="background:#38b764"></i>เส้นทางสั้นสุด</span><span class="lg">🟨 ตัวเลขเหนือจุด = ระยะ</span>',
+  kruskal:'<span class="lg"><i class="ln" style="background:#38b764"></i>เส้นใน Spanning Tree/Forest</span><span class="lg"><i class="ln" style="background:#94b0c2"></i>ข้ามเพราะเกิดวงจร</span>',
+  euler:'<span class="lg"><i class="ln" style="background:#38b764"></i>เส้นทาง Euler</span>',
+  bipartite:'<span class="lg"><i style="background:#ef7d57"></i>ฝั่งที่ 1</span><span class="lg"><i style="background:#41a6f6"></i>ฝั่งที่ 2</span>',
+  isomorphism:'',
+  hamiltonian:'<span class="lg"><i class="ln" style="background:#38b764"></i>Path/Cycle ที่ผ่านทุกจุดหนึ่งครั้ง</span>',
+  planarity:'<span class="lg">K₅ หรือ K₃,₃ minor → ไม่เป็นกราฟเชิงระนาบ</span><span class="lg">กราฟเชิงระนาบต้องใช้ไม่เกิน 4 สี</span>',
+  vertexconnectivity:'<span class="lg"><i style="background:#ef7d57"></i>จุดยอดที่ต้องตัด</span>',
+  edgeconnectivity:'<span class="lg"><i class="dash"></i>เส้นเชื่อมที่ต้องตัด</span>',
+  degreeSequence:'',
+  complement:'',
+  edgeColor:'<span class="lg">สีของเส้น = กลุ่มเส้นที่ไม่มีจุดร่วมกัน</span>',
   prim:'<span class="lg"><i class="ln" style="background:#ef7d57"></i>เส้นตัวเลือก</span><span class="lg"><i class="ln" style="background:#38b764"></i>อยู่ในต้นไม้</span><span class="lg"><i style="background:#a7f070"></i>จุดในต้นไม้</span>',
   color:'<span class="lg"><i style="background:#fff;border-color:#b13e53;border-width:4px"></i>จุดที่กำลังพิจารณา</span><span class="lg"><i class="ln" style="background:#ef7d57"></i>เส้นขัดแย้ง</span><span class="lg">สีของจุด = กลุ่ม (ช่วงเวลา/ช่องเก็บ)</span>',
   flow:'<span class="lg">ตัวเลข f/c = flow/ความจุ</span><span class="lg"><i class="ln" style="background:#3b5dc9"></i>มี flow</span><span class="lg"><i class="ln" style="background:#5d275d"></i>เต็ม</span><span class="lg"><i class="dash"></i>คอขวด (Min Cut)</span><span class="lg"><i style="background:#73eff7"></i>ฝั่ง S</span>'
 };
 function setTab(key){
   algo = TABS[key] ? key : 'dijkstra'; const T = TABS[algo];
+  setIsomorphismSplit(algo === 'isomorphism');
+  if(algo !== 'isomorphism'){
+    isoGraph=null;isoFirstGraph=null;isoMapping=null;isoColors=[];
+    isoSelNode=null;isoEdgePreview=null;lastActiveSide='left';
+    $('#isoMappingLegend').replaceChildren();
+    $('#isoMappingLegend').classList.remove('visible');
+    $('#isoRightStatus').textContent='เลือก Isomorphic Graphs แล้วเริ่มเปรียบเทียบเพื่อแสดงกราฟที่สอง';
+  }else{
+    $('#isoRightStatus').textContent=isoGraph
+      ? `กราฟที่สองมี ${isoGraph.nodes.length} จุด • ${isoGraph.edges.length} เส้น — ใช้เครื่องมือด้านบนแก้ไขได้`
+      : 'เลือกเครื่องมือเพิ่มจุด/เชื่อมเส้น แล้วสร้างกราฟที่สองทางฝั่งขวา';
+  }
   clearRun();
   $$('#tabs .btn').forEach(b => b.classList.toggle('on', b.dataset.tab === algo));
   $('#algoDesc').innerHTML = `<b>${T.icon} ${T.name}</b> — ${T.desc}` + (T.app ? `<span class="app">💡 การประยุกต์: ${T.app}</span>` : '');
@@ -885,8 +1353,9 @@ function refreshSelects(){
 function updateBadge(){
   const comps = G.nodes.length ? components().length : 0;
   $('#badge').textContent = `|V| ${G.nodes.length} · |E| ${G.edges.length} · ${G.directed ? 'มีทิศ →' : 'ไม่มีทิศ —'}`;
-  $('#dirIc').textContent = G.directed ? '→' : '—';
-  $('#dirTxt').textContent = G.directed ? 'มีทิศ' : 'ไม่มีทิศ';
+  const controlGraph=lastActiveSide==='right'&&isoSplitView&&isoGraph?isoGraph:G;
+  $('#dirIc').textContent = controlGraph.directed ? '→' : '—';
+  $('#dirTxt').textContent = controlGraph.directed ? 'มีทิศ' : 'ไม่มีทิศ';
   $('#quick').textContent = `|V| = ${G.nodes.length} • |E| = ${G.edges.length} • ` + (comps <= 1 ? 'Connected ✔' : `⚠ ไม่ Connected (${comps} ส่วน)`) + ` • Undo ได้ ${undoStack.length} ขั้น`;
 }
 const HINTS = {
@@ -895,12 +1364,20 @@ const HINTS = {
   edge:'🔗 แตะจุดแรก แล้วแตะจุดที่สอง เพื่อสร้างเส้นและใส่น้ำหนัก',
   edit:'✏️ แตะจุดเพื่อตั้งชื่อ (เช่น คลังสินค้า) • แตะเส้นเพื่อเปลี่ยนน้ำหนัก',
   bend:'〰️ ลากที่เส้นเพื่อดัดให้โค้ง • แตะเส้นเพื่อทำให้ตรง',
-  del:'🗑️ แตะจุดหรือเส้นที่ต้องการลบ (กด Undo ได้)'
+  del:'🗑️ แตะจุดหรือเส้นที่ต้องการลบ (กด Undo ได้)',
+  edgeColor:'🎨 แตะเส้นที่ต้องการเปลี่ยนสี'
 };
 function updateHint(){
   let h = HINTS[tool];
-  if(tool === 'edge' && selNode != null && nodeById(selNode)) h = `🔗 เลือก "${nm(selNode)}" แล้ว → แตะจุดปลายทาง (แตะที่ว่างเพื่อยกเลิก)`;
+  const useRight=lastActiveSide==='right'&&isoSplitView;
+  const currentGraph=useRight?isoGraph:G, selected=useRight?isoSelNode:selNode;
+  if(tool === 'edge' && selected != null && currentGraph){
+    const node=currentGraph.nodes.find(item=>item.id===selected);
+    if(node)h=`🔗 เลือก "${node.label}" แล้ว → แตะจุดปลายทาง (แตะจุดเดิมเพื่อสร้าง self-loop, แตะที่ว่างเพื่อยกเลิก)`;
+  }
   $('#hint').textContent = h;
+  const toolNames = {move:'ย้าย/เลื่อน',node:'เพิ่มจุด',edge:'เชื่อมเส้น',edit:'แก้ชื่อ/น้ำหนัก',bend:'ดัดเส้น',del:'ลบ',edgeColor:'ระบายสีเส้น'};
+  $('#toolStatus').textContent = `โหมด: ${toolNames[tool] || tool} · ${(currentGraph||G).directed ? 'Directed' : 'Undirected'}${isoSplitView?` · แก้ไข: กราฟที่ ${useRight?'2':'1'}`:''} · Ctrl/⌘+Z Undo · 1–7 เปลี่ยนโหมด`;
 }
 
 /* ---------- presets ---------- */
@@ -924,10 +1401,138 @@ const PRESETS = {
     return mk(false, nodes, [[1,2,1],[1,3,1],[1,8,1],[1,7,1],[2,3,1],[2,8,1],[2,4,1],[3,4,1],[4,5,1],[5,6,1],[5,8,1],[6,7,1],[3,8,1]],
       {colorNames:['จันทร์ 09:00','จันทร์ 13:00','อังคาร 09:00','อังคาร 13:00','พุธ 09:00','พุธ 13:00']});
   }},
+  k33:{name:'🧩 ปัญหา Utility (K₃,₃)', tab:'bipartite', desc:'บ้าน 3 หลังและสาธารณูปโภค 3 แห่ง: ตรวจการแบ่งสองฝั่งของกราฟสมบูรณ์ K₃,₃', build:() => mk(false,
+    [[170,130,'บ้าน 1'],[170,300,'บ้าน 2'],[170,470,'บ้าน 3'],[620,130,'น้ำ'],[620,300,'ไฟฟ้า'],[620,470,'ก๊าซ']],
+    Array.from({length:9},(_,i)=>[Math.floor(i/3)+1,4+i%3,1]))},
+  koenigsberg:{name:'🌉 สะพานทั้ง 7 แห่งของเคอนิกส์แบร์ก', tab:'euler', desc:'กราฟประวัติศาสตร์ 4 พื้นที่ 7 สะพาน มีจุดยอดดีกรีคี่ 4 จุด จึงไม่มี Euler Path', build:() => mk(false,
+    [[130,150,'ฝั่งเหนือ'],[130,450,'ฝั่งใต้'],[440,170,'เกาะ Kneiphof'],[440,430,'เกาะ Lomse']],
+    [[1,3,1,-0.3],[1,3,1,0.3],[2,3,1,-0.3],[2,3,1,0.3],[1,4,1,0],[2,4,1,0],[3,4,1,0.12]])},
   pipe:{name:'🚰 โครงข่ายท่อ/ถนน', tab:'flow', desc:'ส่งสินค้าจากโรงงานไปตลาดกลางได้มากที่สุดกี่หน่วย/ชม. และคอขวดอยู่ที่ไหน', build:() => mk(true,
     [[80,260,'โรงงาน'],[280,110,'คลัง A'],[280,410,'คลัง B'],[520,110,'ศูนย์ C'],[520,410,'ศูนย์ D'],[720,260,'ตลาดกลาง']],
     [[1,2,16],[1,3,13],[3,2,4],[2,4,12],[4,3,9],[3,5,14],[5,4,7],[4,6,20],[5,6,4]], {source:1, sink:6})}
 };
+function showGenerator(){
+  openModal('🧩 ตัวสร้างกราฟ', `<p>สร้างกราฟใหม่ (กด Undo เพื่อกลับกราฟเดิม)</p>
+    <div class="row"><label class="sel">ชนิดกราฟ<select id="genType">
+      <option value="complete">กราฟสมบูรณ์ Kₙ</option><option value="cycle">วงจร Cₙ</option>
+      <option value="path">เส้นทาง Pₙ</option><option value="star">ดาว Star</option>
+      <option value="bipartite">สองส่วน Kₘ,ₙ</option><option value="grid">Grid</option>
+      <option value="hypercube">Hypercube Qₙ</option><option value="random">สุ่ม G(n,p)</option>
+      <option value="tree">ต้นไม้สุ่ม</option><option value="dag">DAG สุ่ม</option>
+      <option value="petersen">Petersen</option></select></label></div>
+    <div class="row"><label class="sel">จำนวนจุด n <input id="genN" type="number" min="1" max="60" value="8"></label>
+      <label class="sel">m (Kₘ,ₙ) / แถว <input id="genM" type="number" min="1" max="60" value="4"></label></div>
+    <div class="row"><label class="sel">ความน่าจะเป็น p (0–1) <input id="genP" type="number" min="0" max="1" step="0.05" value="0.3"></label></div>
+    <button type="button" class="btn primary" id="buildGraph">สร้างกราฟ</button>
+    <p class="note">กราฟสมบูรณ์จำกัด n ≤ 40 และจำนวนจุดสูงสุด 60 เพื่อให้แอปตอบสนองได้ดี</p>`);
+}
+function buildGeneratedGraph(){
+  const type = $('#genType').value, n = Number($('#genN').value), m = Number($('#genM').value), p = Number($('#genP').value);
+  if(type === 'petersen'){
+    const es = [];
+    for(let i=0;i<5;i++){ es.push([i+1,(i+1)%5+1,1],[i+6,(i+1)%5+6,1],[i+1,i+6,1]); }
+    const ns=Array.from({length:10},(_,i)=>{const a=2*Math.PI*i/10-Math.PI/2;return [400+230*Math.cos(a),300+230*Math.sin(a),`v${i+1}`];});
+    return mk(false, ns, es);
+  }
+  if(!Number.isInteger(n) || n < 1 || n > 60) throw new Error('จำนวนจุดต้องเป็นจำนวนเต็ม 1–60');
+  if(!Number.isInteger(m) || m < 1 || m > 60) throw new Error('ค่า m ต้องเป็นจำนวนเต็ม 1–60');
+  if(!Number.isFinite(p) || p < 0 || p > 1) throw new Error('p ต้องอยู่ระหว่าง 0 ถึง 1');
+  if(type === 'complete' && n > 40) throw new Error('Kₙ จำกัด n ≤ 40 เพื่อไม่ให้มีเส้นมากเกินไป');
+  if(type === 'hypercube' && n > 6) throw new Error('Qₙ จำกัด n ≤ 6 (สูงสุด 64 จุด)');
+  const count = type === 'bipartite' ? n + m : type === 'hypercube' ? 2 ** n : n;
+  if(count > 60) throw new Error('กราฟนี้มีจุดเกินขีดจำกัด 60 จุด');
+  const nodes = Array.from({length:count},(_,i)=>{
+    const a = 2*Math.PI*i/count - Math.PI/2, r = Math.min(260, 48*count);
+    return [400+r*Math.cos(a), 300+r*Math.sin(a), `v${i+1}`];
+  });
+  const edges = [];
+  const add = (u,v) => edges.push([u+1,v+1,1]);
+  if(type === 'complete'){
+    for(let i=0;i<n;i++) for(let j=i+1;j<n;j++) add(i,j);
+  } else if(type === 'cycle'){
+    if(n < 3) throw new Error('วงจร Cₙ ต้องมี n ≥ 3');
+    for(let i=0;i<n;i++) add(i,(i+1)%n);
+  } else if(type === 'path'){
+    for(let i=0;i<n-1;i++) add(i,i+1);
+  } else if(type === 'star'){
+    for(let i=1;i<n;i++) add(0,i);
+  } else if(type === 'bipartite'){
+    for(let i=0;i<n;i++) for(let j=0;j<m;j++) add(i,n+j);
+  } else if(type === 'grid'){
+    const rows = Math.max(1, Math.floor(Math.sqrt(n))), cols = Math.ceil(n/rows);
+    for(let i=0;i<n;i++){ if(i%cols && i-1>=0) add(i-1,i); if(i-cols>=0) add(i-cols,i); }
+    nodes.forEach((v,i)=>{ v[0]=100+(i%cols)*100; v[1]=100+Math.floor(i/cols)*100; });
+  } else if(type === 'hypercube'){
+    for(let i=0;i<count;i++) for(let b=0;b<n;b++){ const j=i^(1<<b); if(i<j) add(i,j); }
+    nodes.forEach((v,i)=>{ v[2]=i.toString(2).padStart(n,'0'); });
+  } else if(type === 'tree'){
+    for(let i=1;i<n;i++) add(i,Math.floor(Math.random()*i));
+  } else if(type === 'random' || type === 'dag'){
+    for(let i=0;i<n;i++) for(let j=i+1;j<n;j++) if(Math.random()<p) add(i,j);
+  }
+  if(edges.length > 1500) throw new Error('กราฟมีเส้นเกิน 1,500 เส้น');
+  return mk(type === 'dag', nodes, edges);
+}
+function showLayouts(){
+  const items = [['circular','วงกลม'],['grid','ตาราง'],['force','Force-directed'],
+    ['hierarchical','ลำดับชั้น'],['bipartite','สองคอลัมน์']];
+  openModal('🪄 จัดวางอัตโนมัติ', '<p>จัดตำแหน่งจุดใหม่โดยไม่เปลี่ยนเส้นเชื่อม</p><div class="row">' +
+    items.map(([key,label])=>`<button type="button" class="btn" data-layout="${key}">${label}</button>`).join('') + '</div>');
+}
+function applyLayout(kind){
+  const nodes = G.nodes, n = nodes.length;
+  if(!n) return toast('ยังไม่มีจุดยอด');
+  const positions = new Map();
+  if(kind === 'circular'){
+    nodes.forEach((v,i)=>{ const a=2*Math.PI*i/n-Math.PI/2; positions.set(v.id,{x:400+Math.min(280,48*n)*Math.cos(a),y:300+Math.min(280,48*n)*Math.sin(a)}); });
+  } else if(kind === 'grid'){
+    const cols=Math.ceil(Math.sqrt(n));
+    nodes.forEach((v,i)=>positions.set(v.id,{x:120+(i%cols)*100,y:100+Math.floor(i/cols)*100}));
+  } else if(kind === 'bipartite'){
+    const split=Math.ceil(n/2), left=nodes.slice(0,split), right=nodes.slice(split);
+    left.forEach((v,i)=>positions.set(v.id,{x:180,y:100+i*500/Math.max(1,left.length-1)}));
+    right.forEach((v,i)=>positions.set(v.id,{x:620,y:100+i*500/Math.max(1,right.length-1)}));
+  } else if(kind === 'hierarchical'){
+    const levels=new Map(nodes.map((v,i)=>[v.id,0]));
+    for(let pass=0;pass<n;pass++) for(const e of G.edges) if(levels.has(e.u)&&levels.has(e.v))
+      levels.set(e.v,Math.max(levels.get(e.v),levels.get(e.u)+1));
+    const max=Math.max(0,...levels.values()), groups=new Map();
+    nodes.forEach(v=>{const l=levels.get(v.id);if(!groups.has(l))groups.set(l,[]);groups.get(l).push(v);});
+    for(const [l,group] of groups) group.forEach((v,i)=>positions.set(v.id,{x:100+(i+1)*600/(group.length+1),y:70+l*450/Math.max(1,max)}));
+  } else {
+    const pos=nodes.map(v=>({x:v.x,y:v.y}));
+    for(let step=0;step<60;step++){
+      const dx=Array(n).fill(0),dy=Array(n).fill(0);
+      for(let i=0;i<n;i++) for(let j=i+1;j<n;j++){
+        let x=pos[i].x-pos[j].x,y=pos[i].y-pos[j].y,d=Math.hypot(x,y)||1,f=1800/(d*d);
+        dx[i]+=x/d*f;dy[i]+=y/d*f;dx[j]-=x/d*f;dy[j]-=y/d*f;
+      }
+      for(const e of G.edges){const i=nodes.findIndex(v=>v.id===e.u),j=nodes.findIndex(v=>v.id===e.v);if(i<0||j<0||i===j)continue;
+        const x=pos[j].x-pos[i].x,y=pos[j].y-pos[i].y,d=Math.hypot(x,y)||1,f=d*d/500;
+        dx[i]+=x/d*f;dy[i]+=y/d*f;dx[j]-=x/d*f;dy[j]-=y/d*f;
+      }
+      const temp=12*(1-step/60);
+      pos.forEach((v,i)=>{v.x+=clamp(dx[i],-temp,temp);v.y+=clamp(dy[i],-temp,temp);});
+    }
+    nodes.forEach((v,i)=>positions.set(v.id,pos[i]));
+  }
+  commit(()=>nodes.forEach(v=>Object.assign(v,positions.get(v.id))),false);
+  closeModal();fitView();toast('จัดวางกราฟแล้ว');
+}
+function searchNode(){
+  const q=$('#nodeSearch').value.trim().toLocaleLowerCase();
+  const n=G.nodes.find(v=>String(v.id)===q.replace(/^v/,'')||v.label.toLocaleLowerCase()===q);
+  if(!n) return toast('ไม่พบจุดยอดที่ค้นหา');
+  view.s=1.35;view.x=W/2-n.x*view.s;view.y=H/2-n.y*view.s;draw();toast(`พบ ${n.label}`);
+}
+function runQuickCommand(){
+  const input=$('#quickCommand'), match=input.value.match(/^\s*(.+?)\s*-\s*(.+?)\s*:\s*(-?(?:\d+\.?\d*|\.\d+))\s*$/);
+  if(!match) return toast('รูปแบบคำสั่งไม่ถูกต้อง ตัวอย่าง: v1-v2:5');
+  const find=q=>G.nodes.find(v=>String(v.id)===q.replace(/^v/i,'')||v.label.toLocaleLowerCase()===q.toLocaleLowerCase());
+  const u=find(match[1].trim()),v=find(match[2].trim()),w=Number(match[3]);
+  if(!u||!v||!Number.isFinite(w)) return toast('ไม่พบจุดยอด หรือค่าน้ำหนักไม่ถูกต้อง');
+  commit(()=>storeEdge(u.id,v.id,w));input.value='';toast(`เพิ่มเส้น ${u.label} ${G.directed?'→':'–'} ${v.label} = ${fmt(w)}`);
+}
 function showPresets(){
   openModal('📂 ตัวอย่างสาธิต', `<p>เลือกตัวอย่าง (กราฟปัจจุบันจะถูกแทนที่ แต่กด Undo กลับได้)</p><div class="pgrid">` +
     Object.entries(PRESETS).map(([k,p]) => `<div class="pcard"><b>${p.name}</b><span style="font-size:14px">${p.desc}</span><span style="font-size:13px">อัลกอริทึม: <b>${TABS[p.tab].name}</b></span><button type="button" class="btn primary" data-preset="${k}">เปิดตัวอย่างนี้</button></div>`).join('') + '</div>');
@@ -973,15 +1578,17 @@ function showHelp(){
   <div class="tw"><table class="tbl">
     <tr><td>✋</td><td class="l">ลากจุด / เลื่อนจอ / แตะ 2 ครั้งเพื่อแก้ไข</td></tr>
     <tr><td>⬛</td><td class="l">เพิ่มจุดยอด</td></tr>
-    <tr><td>🔗</td><td class="l">สร้างเส้น + ใส่น้ำหนัก (ตัวเลขไม่ติดลบ)</td></tr>
+    <tr><td>🔗</td><td class="l">สร้างเส้น รวม self-loop, เส้นขนาน และน้ำหนักติดลบ</td></tr>
     <tr><td>✏️</td><td class="l">ตั้งชื่อจุด (เช่น คลังสินค้า) / แก้น้ำหนักเส้น</td></tr>
     <tr><td>〰️</td><td class="l">ดัดเส้นให้โค้ง / แตะเพื่อให้ตรง</td></tr>
     <tr><td>🗑️</td><td class="l">ลบจุดหรือเส้น</td></tr>
     <tr><td>⇄</td><td class="l">สลับกราฟมีทิศ / ไม่มีทิศ</td></tr>
     <tr><td>⌖</td><td class="l">จัดกราฟให้อยู่กึ่งกลางจอ</td></tr>
   </table></div>
+  <div class="note">🔁 โหมด Isomorphic Graphs: ใช้เครื่องมือชุดเดียวกันสร้าง/แก้กราฟได้ทั้งฝั่งซ้ายและขวา (เลือกฝั่งด้วยการแตะหรือลากบนกราฟ) แล้วกดเริ่มรันและเลือก “ใช้กราฟที่วาดไว้ทางขวา” เพื่อเปรียบเทียบ</div>
   <h3>ทางลัด</h3>
-  <p>Ctrl/⌘+Z = Undo • Ctrl/⌘+Y หรือ Ctrl/⌘+Shift+Z = Redo (ประมาณ 70 ขั้น) • ← → = ย้อน/ถัดไป • Space = เล่น/หยุด • ล้อเมาส์หรือบีบ 2 นิ้ว = ซูม</p>
+  <p>Ctrl/⌘+Z = Undo • Ctrl/⌘+Y หรือ Ctrl/⌘+Shift+Z = Redo (ประมาณ 70 ขั้น) • 1–6 = เลือกโหมด • G = สร้างกราฟ • L = จัดวาง • F = จัดกึ่งกลาง • ← → = ย้อน/ถัดไป • Space = เล่น/หยุด • ล้อเมาส์หรือบีบ 2 นิ้ว = ซูม</p>
+  <div class="note">🧩 สร้างกราฟ Kₙ, Cₙ, Pₙ, Star, Kₘ,ₙ, Grid, Qₙ, G(n,p), Random Tree, DAG และ Petersen • ตัวอย่างมี K₃,₃ และปัญหาสะพานทั้ง 7 ของเคอนิกส์แบร์ก • ค้นหาจุดยอดหรือพิมพ์คำสั่งเช่น v1-v2:-2</div>
   <div class="note">💾 ระบบบันทึกอัตโนมัติในเบราว์เซอร์ (localStorage): จุด เส้น น้ำหนัก ทิศทาง ชื่อ สี และ Source/Sink</div>
   <p><button type="button" class="btn primary" id="helpPreset">📂 เปิดตัวอย่างสาธิต</button></p>`);
 }
@@ -992,20 +1599,40 @@ function init(){
   $('#tabs').addEventListener('click', e => { const b = e.target.closest('[data-tab]'); if(b) setTab(b.dataset.tab); });
   $('#toolbar').addEventListener('click', e => {
     const b = e.target.closest('[data-tool]'); if(!b) return;
-    tool = b.dataset.tool; selNode = null;
+    tool=b.dataset.tool;selNode=null;edgePreview=null;isoSelNode=null;isoEdgePreview=null;
     $$('[data-tool]').forEach(x => x.classList.toggle('on', x === b));
-    updateHint(); draw();
+    updateCanvasCursor(); updateHint(); draw();
   });
-  $('#aDir').onclick = () => { commit(() => { G.directed = !G.directed; }); toast(G.directed ? '→ เปลี่ยนเป็นกราฟมีทิศทาง' : '— เปลี่ยนเป็นกราฟไม่มีทิศทาง'); };
+  $('#aDir').onclick = () => {
+    withLastCanvasSide(()=>commit(()=>{G.directed=!G.directed;}));
+    updateBadge();updateHint();
+    const directed=lastActiveSide==='right'&&isoSplitView&&isoGraph?isoGraph.directed:G.directed;
+    toast(directed?'→ เปลี่ยนเป็นกราฟมีทิศทาง':'— เปลี่ยนเป็นกราฟไม่มีทิศทาง');
+  };
   $('#aUndo').onclick = undo;
   $('#aRedo').onclick = redo;
-  $('#aStraight').onclick = () => { if(!G.edges.some(e => e.curve)) return toast('เส้นตรงอยู่แล้วทั้งหมด'); commit(() => G.edges.forEach(e => e.curve = 0), false); toast('📏 รีเซ็ตเป็นเส้นตรงแล้ว'); };
+  $('#aStraight').onclick = () => withLastCanvasSide(()=>{
+    if(!G.edges.some(e=>e.curve))return toast('เส้นตรงอยู่แล้วทั้งหมด');
+    commit(()=>G.edges.forEach(e=>e.curve=0),false);toast('📏 รีเซ็ตเป็นเส้นตรงแล้ว');
+  });
   $('#aPreset').onclick = showPresets;
+  $('#aGenerate').onclick = showGenerator;
+  $('#aLayout').onclick = showLayouts;
+  $('#searchNode').onclick = () => withLastCanvasSide(searchNode);
+  $('#nodeSearch').addEventListener('keydown',e=>{if(e.key==='Enter')withLastCanvasSide(searchNode);});
+  $('#runCommand').onclick = () => withLastCanvasSide(runQuickCommand);
+  $('#quickCommand').addEventListener('keydown',e=>{if(e.key==='Enter')withLastCanvasSide(runQuickCommand);});
   $('#aPNG').onclick = exportPNG;
-  $('#aClear').onclick = () => { if(!G.nodes.length) return; if(confirm('ล้างกราฟทั้งหมด? (กด Undo กลับได้)')){ const d = G.directed; commit(() => { G = emptyGraph(); G.directed = d; }); selNode = null; } };
+  $('#aClear').onclick = () => withLastCanvasSide(()=>{
+    if(!G.nodes.length)return;
+    if(confirm('ล้างกราฟทั้งหมด? (กด Undo กลับได้)')){
+      const directed=G.directed;commit(()=>{G=emptyGraph();G.directed=directed;});
+      selNode=null;edgePreview=null;
+    }
+  });
   $('#aHelp').onclick = showHelp;
-  $('#zIn').onclick = () => zoomAt(W/2, H/2, 1.25);
-  $('#zOut').onclick = () => zoomAt(W/2, H/2, 0.8);
+  $('#zIn').onclick = () => withLastCanvasSide(()=>zoomAt(W/2,H/2,1.25));
+  $('#zOut').onclick = () => withLastCanvasSide(()=>zoomAt(W/2,H/2,0.8));
   $('#zFit').onclick = fitView;
   $('#selS').onchange = e => { G.source = e.target.value === '' ? null : +e.target.value; clearRun(); save(); draw(); };
   $('#selT').onchange = e => { G.sink = e.target.value === '' ? null : +e.target.value; clearRun(); save(); draw(); };
@@ -1027,7 +1654,26 @@ function init(){
   $('#modal').addEventListener('click', e => { if(e.target.id === 'modal') closeModal(); });
   $('#mbody').addEventListener('click', e => {
     const p = e.target.closest('[data-preset]'); if(p) return loadPreset(p.dataset.preset);
+    if(e.target.closest('#buildDegreeSequence')) return runDegreeSequenceFromInput();
+    if(e.target.closest('#runIsomorphismCompare')) return runIsomorphismComparison();
+    if(e.target.closest('#buildGraph')){
+      try{pushUndo();G=buildGeneratedGraph();selNode=null;clearRun();afterChange();closeModal();fitView();setTab('analyze');toast('สร้างกราฟสำเร็จ');}
+      catch(error){toast(`สร้างกราฟไม่ได้: ${error.message}`);}
+      return;
+    }
+    const layout=e.target.closest('[data-layout]');if(layout)return withLastCanvasSide(()=>applyLayout(layout.dataset.layout));
     if(e.target.closest('#helpPreset')) return showPresets();
+    const edgeColor=e.target.closest('[data-edge-color]');
+    if(edgeColor){
+      const edgeId=Number($('#mbody').dataset.edgeId),side=$('#mbody').dataset.edgeSide||'left';
+      const color=Number(edgeColor.dataset.edgeColor);
+      withCanvasSide(side,()=>{
+        const edge=G.edges.find(item=>item.id===edgeId);
+        if(!edge)return toast('ไม่พบเส้นที่เลือก');
+        commit(()=>{edge.color=color<0?null:color;},false);
+      });
+      closeModal();toast(color<0?'ล้างสีเส้นแล้ว':`เปลี่ยนสีเส้นเป็นสี ${color+1} แล้ว`);return;
+    }
     const cn = e.target.closest('[data-cname]');
     if(cn){
       const i = +cn.dataset.cname;
@@ -1035,11 +1681,25 @@ function init(){
       if(s !== null){ G.colorNames[i] = s.trim() || `สี ${i+1}`; save(); if(run && run.key === 'color') $('#mbody').innerHTML = run.summary(); }
     }
   });
+  $('#mbody').addEventListener('keydown', e => {
+    if(e.target.id === 'degreeSequenceInput' && e.key === 'Enter'){
+      e.preventDefault();
+      runDegreeSequenceFromInput();
+    }
+  });
   window.addEventListener('keydown', e => {
     const tg = e.target.tagName; if(tg === 'INPUT' || tg === 'SELECT' || tg === 'TEXTAREA') return;
     if((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z'){ e.preventDefault(); if(e.shiftKey) redo(); else undo(); }
     else if((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'y'){ e.preventDefault(); redo(); }
     else if(e.key === 'Escape') closeModal();
+    else if(e.key.toLowerCase() === 'g') showGenerator();
+    else if(e.key.toLowerCase() === 'l') showLayouts();
+    else if(e.key.toLowerCase() === 'f') fitView();
+    else if(/^[1-7]$/.test(e.key)){
+      const tools=['move','node','edge','edit','bend','del','edgeColor'], key=tools[Number(e.key)-1];
+      const button=$(`[data-tool="${key}"]`);
+      if(button){tool=key;selNode=null;edgePreview=null;$$('[data-tool]').forEach(x=>x.classList.toggle('on',x===button));updateCanvasCursor();updateHint();draw();}
+    }
     else if(e.key === 'ArrowRight') manual(() => go(stepIdx+1));
     else if(e.key === 'ArrowLeft') manual(() => go(stepIdx-1));
     else if(e.key === ' '){ e.preventDefault(); play(); }
@@ -1055,6 +1715,9 @@ function init(){
   if(!savedTab){ fitView(); setTimeout(showHelp, 300); }
 }
 if(document.fonts && document.fonts.ready) document.fonts.ready.then(() => draw());
+if('serviceWorker' in navigator && location.protocol !== 'file:'){
+  navigator.serviceWorker.register('/service-worker.js').catch(error => console.error('PWA service worker registration failed:', error));
+}
 init();
 })();
 </script>
