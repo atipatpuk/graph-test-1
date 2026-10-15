@@ -1,3 +1,5 @@
+
+
 """Python implementations of the graph algorithms used by Graph Theory Lab."""
 
 from __future__ import annotations
@@ -2406,7 +2408,21 @@ def _planarity(payload: dict[str, Any]) -> dict[str, Any]:
             '<div class="hero">เป็นกราฟเชิงระนาบ: ไม่พบ K₅ หรือ K₃,₃ minor</div>'
             + theorem_note
         )
-        return _result("Planarity / Kuratowski", "planarity", steps, summary, planar=True)
+        try:
+            import networkx as nx
+        except ImportError as error:
+            raise ValueError(
+                "สร้าง planar embedding ไม่ได้ กรุณาติดตั้ง dependencies ด้วย python -m pip install -r requirements.txt"
+            ) from error
+        planar_graph = nx.Graph()
+        planar_graph.add_nodes_from(ids)
+        planar_graph.add_edges_from(simple_edges)
+        planar_layout = nx.planar_layout(planar_graph)
+        return _result(
+            "Planarity / Kuratowski", "planarity", steps, summary,
+            planar=True,
+            planarLayout={str(node_id): [float(value) for value in planar_layout[node_id]] for node_id in ids},
+        )
 
     steps.append(_step(f"ตรวจแล้ว {len(visited)} สถานะ แต่ถึงขีดจำกัดการค้นหา"))
     summary = (

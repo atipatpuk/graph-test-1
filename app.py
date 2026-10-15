@@ -5,6 +5,7 @@ Graph Theory Lab (Logistics & Urban Planning)
 อัลกอริทึม: Dijkstra, Prim, Graph Coloring (Welsh-Powell), Network Flow (Edmonds-Karp)
 
 วิธีรัน:  python app.py
+- ติดตั้งครั้งแรก: python -m pip install -r requirements.txt
 - เปิดเบราว์เซอร์อัตโนมัติที่ http://localhost:8765
 - มือถือ/แท็บเล็ตใน Wi-Fi เดียวกัน: เปิด URL แบบ LAN ที่แสดงใน Terminal
 - จะสร้างไฟล์ graph_lab.html ไว้ข้าง ๆ (การรันอัลกอริทึมต้องเปิดผ่านเซิร์ฟเวอร์นี้)
@@ -272,7 +273,7 @@ const isoCv = $('#isoCv'), isoCtx = isoCv.getContext('2d');
 const FONT = "'Mitr',Tahoma,sans-serif";
 const INK = '#1a1c2c', PAPER = '#f4efe1';
 const PALETTE = ['#ef7d57','#41a6f6','#a7f070','#ffcd75','#f4a6d7','#73eff7','#b13e53','#38b764','#c28a4a','#94b0c2','#5d275d','#3b5dc9','#257179','#d4a5ff','#566c86'];
-const NODE_FILL = {current:'#ffcd75', consider:'#ef7d57', visited:'#a7f070', path:'#38b764', inS:'#73eff7'};
+const NODE_FILL = {current:'#d7263d', consider:'#3a86ff', visited:'#2a9d8f', path:'#f4a261', inS:'#8338ec'};
 const EDGE_STY = {
   base:{c:INK,w:3}, consider:{c:'#ef7d57',w:6,hl:1}, soft:{c:'#38b764',w:4}, tree:{c:'#38b764',w:6,hl:1},
   path:{c:'#38b764',w:8,hl:1}, reject:{c:'#94b0c2',w:3,dash:1}, cut:{c:'#b13e53',w:7,dash:1,hl:1},
@@ -283,7 +284,8 @@ const IOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform 
 
 function emptyGraph(){ return {nodes:[], edges:[], directed:false, nextId:1, nextEid:1, source:null, sink:null, colorNames:[]}; }
 let G = emptyGraph(), view = {x:0, y:0, s:1}, W = 300, H = 300, DPR = 1;
-let isoGraph = null, isoFirstGraph = null, isoView = {x:0, y:0, s:1}, isoMapping = null, isoColors = [];
+let isoGraph = null, isoFirstGraph = null, isoView = {x:0, y:0, s:1}, isoMapping = null, isoColors = [], isoAnimation = null;
+let planarityAnimation = null;
 let isoSplitView = false, isoPreviousView = null;
 let tool = 'move', selNode = null, isoSelNode = null, undoStack = [], redoStack = [], algo = 'dijkstra';
 let activeSide = 'left', lastActiveSide = 'left', sideContext = null;
@@ -427,24 +429,39 @@ function withLastCanvasSide(action){
 
 /* ---------- geometry ---------- */
 function toWorld(sx, sy){ return {x:(sx-view.x)/view.s, y:(sy-view.y)/view.s}; }
-function edgeGeom(e){
+function parallelEdgeCurves(graph){
+  const groups=new Map(),curves=new Map();
+  for(const edge of graph.edges){
+    const key=edge.u===edge.v?`loop:${edge.u}`:`pair:${Math.min(edge.u,edge.v)}:${Math.max(edge.u,edge.v)}`;
+    if(!groups.has(key))groups.set(key,[]);
+    groups.get(key).push(edge);
+  }
+  for(const group of groups.values()){
+    if(group.length<2)continue;
+    group.sort((a,b)=>a.id-b.id);
+    group.forEach((edge,index)=>curves.set(edge.id,(index-(group.length-1)/2)*28));
+  }
+  return curves;
+}
+function edgeGeom(e, curveMap=null){
   const a = nodeById(e.u), b = nodeById(e.v); if(!a || !b) return null;
+  const curve=curveMap&&curveMap.has(e.id)?curveMap.get(e.id)*(e.u<=e.v?1:-1):(e.curve||0);
   if(a === b){
-    const offset = e.curve || 0, lift = 48 + Math.abs(offset);
+    const offset = curve, lift = 48 + Math.abs(offset);
     return {a:{x:a.x-12,y:a.y-17},b:{x:a.x+12,y:a.y-17},mx:a.x+offset,my:a.y-lift/2,
       nx:1,ny:0,cx:a.x+offset,cy:a.y-lift,px:a.x+offset,py:a.y-lift/2};
   }
   const mx=(a.x+b.x)/2, my=(a.y+b.y)/2, dx=b.x-a.x, dy=b.y-a.y, L=Math.hypot(dx,dy)||1;
-  const nx=-dy/L, ny=dx/L, c=e.curve||0;
+  const nx=-dy/L, ny=dx/L, c=curve;
   return {a, b, mx, my, nx, ny, cx:mx+nx*c*2, cy:my+ny*c*2, px:mx+nx*c, py:my+ny*c};
 }
 function bez(g, t){ const u=1-t; return {x:u*u*g.a.x+2*u*t*g.cx+t*t*g.b.x, y:u*u*g.a.y+2*u*t*g.cy+t*t*g.b.y}; }
 function distSeg(p, a, b){ const dx=b.x-a.x, dy=b.y-a.y, L=dx*dx+dy*dy; let t=L?((p.x-a.x)*dx+(p.y-a.y)*dy)/L:0; t=clamp(t,0,1); return Math.hypot(p.x-(a.x+t*dx), p.y-(a.y+t*dy)); }
 function hitNode(w){ const r=NR+6/view.s; for(let i=G.nodes.length-1;i>=0;i--){ const n=G.nodes[i]; if(Math.abs(w.x-n.x)<=r && Math.abs(w.y-n.y)<=r) return n; } return null; }
 function hitEdge(w){
-  const tol = 12/view.s; let best=null, bd=tol;
+  const tol = 12/view.s, curveMap=parallelEdgeCurves(G); let best=null, bd=tol;
   for(const e of G.edges){
-    const g = edgeGeom(e); if(!g) continue;
+    const g = edgeGeom(e,curveMap); if(!g) continue;
     const dl = Math.hypot(w.x-g.px, w.y-g.py); if(dl < 16/view.s && dl < bd){ bd=dl; best=e; }
     let prev = bez(g,0);
     for(let i=1;i<=24;i++){ const p=bez(g,i/24); const d=distSeg(w,prev,p); if(d<bd){ bd=d; best=e; } prev=p; }
@@ -513,7 +530,8 @@ function renderScene(c, w, h, v, graph=G, stepOverride=undefined, comparisonPane
     }
     c.save(); c.translate(v.x, v.y); c.scale(v.s, v.s);
     const st = stepOverride === undefined ? currentStep() : stepOverride, showW = algo !== 'color';
-    for(const e of G.edges) drawEdge(c, e, st, showW, comparisonPanel);
+    const curveMap=parallelEdgeCurves(G);
+    for(const e of G.edges) drawEdge(c, e, st, showW, comparisonPanel, curveMap);
     const preview=graph===isoGraph ? {node:isoSelNode,point:isoEdgePreview} : {node:selNode,point:edgePreview};
     if(tool==='edge' && preview.node!=null && preview.point) drawEdgePreview(c,preview.node,preview.point);
     for(const n of G.nodes) drawNode(c, n, st, comparisonPanel);
@@ -552,8 +570,8 @@ function roundedBox(c, x, y, size, radius=6){
   c.lineTo(x+r,y+size); c.quadraticCurveTo(x,y+size,x,y+size-r);
   c.lineTo(x,y+r); c.quadraticCurveTo(x,y,x+r,y); c.closePath();
 }
-function drawEdge(c, e, st, showW, comparisonPanel=false){
-  const g = edgeGeom(e); if(!g) return;
+function drawEdge(c, e, st, showW, comparisonPanel=false, curveMap=null){
+  const g = edgeGeom(e,curveMap); if(!g) return;
   const hovered = !comparisonPanel && hoverEdge === e.id, key = st && st.edge ? st.edge[e.id] : null;
   const S = EDGE_STY[key] || EDGE_STY.base;
   if(hovered){
@@ -1060,6 +1078,10 @@ async function runPythonAlgorithm(algorithm, extra = {}){
     });
     const result = await response.json();
     if(!response.ok) throw new Error(result.error || `HTTP ${response.status}`);
+    if(result.key==='planarity'){
+      if(result.planar===true&&result.planarLayout)preparePlanarityAnimation(result.planarLayout);
+      else resetPlanarityAnimation();
+    }
     if(result.key === 'pruferDecode' || result.key === 'graphTransform' || (result.key === 'degreeSequence' && result.exists)){
       pushUndo();
       const center = toWorld(W/2, H/2), radius = Math.max(90, result.nodes.length * 18);
@@ -1092,7 +1114,8 @@ async function runPythonAlgorithm(algorithm, extra = {}){
     setRun({
       key:result.key,
       title:result.title,
-      steps:result.steps,
+      steps:result.key === 'isomorphism' && result.isomorphic ? isomorphismAnimationSteps() :
+        result.key === 'planarity' && result.planar === true && result.planarLayout ? planarityAnimationSteps() : result.steps,
       summary:() => result.summary.replace(/\{\{COLOR_NAME_(\d+)\}\}/g, (_, i) => esc(cName(+i))) +
         (result.key === 'isomorphism' && result.isomorphic ? isomorphismMappingSummary() : '')
     });
@@ -1146,11 +1169,55 @@ function displayIsomorphismComparison(otherGraph,result){
   }
   const stageRect=$('#stage').getBoundingClientRect();
   isoView=fitGraphView(isoGraph,Math.max(1,stageRect.width-W),H);
+  if(isoMapping){
+    const leftById=new Map(isoFirstGraph.nodes.map(node=>[String(node.id),node]));
+    isoAnimation={frame:0,initial:new Map(),targets:new Map()};
+    for(const node of isoGraph.nodes) isoAnimation.initial.set(String(node.id),{x:node.x,y:node.y});
+    for(const pair of isoColors){
+      const left=leftById.get(pair.leftId);
+      if(!left) continue;
+      isoAnimation.targets.set(pair.rightId,{
+        x:(view.x+left.x*view.s-isoView.x)/isoView.s,
+        y:(view.y+left.y*view.s-isoView.y)/isoView.s
+      });
+    }
+  }else isoAnimation=null;
   draw();
+}
+function isomorphismAnimationSteps(){
+  return [
+    {msg:'เริ่มต้น: กราฟที่สองยังอยู่ในตำแหน่งเดิม'},
+    ...isoColors.map((pair,index)=>({msg:`ขั้น ${index+1}/${isoColors.length}: จัด ${pair.rightLabel} ให้ตรงกับ ${pair.leftLabel}`}))
+  ];
+}
+function animateIsomorphismTo(index){
+  if(!isoAnimation||!isoGraph||algo!=='isomorphism') return;
+  if(isoAnimation.frame) cancelAnimationFrame(isoAnimation.frame);
+  const matched=new Set(isoColors.slice(0,clamp(index,0,isoColors.length)).map(pair=>pair.rightId));
+  const starts=new Map(),destinations=new Map();
+  isoGraph.nodes.forEach(node=>{
+    const id=String(node.id),target=matched.has(id)?isoAnimation.targets.get(id):isoAnimation.initial.get(id);
+    if(target){starts.set(id,{x:node.x,y:node.y});destinations.set(id,target);}
+  });
+  const startTime=performance.now(),duration=420;
+  const frame=now=>{
+    if(!isoAnimation) return;
+    const progress=clamp((now-startTime)/duration,0,1),eased=1-Math.pow(1-progress,3);
+    isoGraph.nodes.forEach(node=>{
+      const id=String(node.id),from=starts.get(id),to=destinations.get(id);
+      if(from&&to){node.x=from.x+(to.x-from.x)*eased;node.y=from.y+(to.y-from.y)*eased;}
+    });
+    draw();
+    if(progress<1) isoAnimation.frame=requestAnimationFrame(frame);
+    else isoAnimation.frame=0;
+  };
+  isoAnimation.frame=requestAnimationFrame(frame);
 }
 function invalidateIsomorphismResult(){
   if(!isoFirstGraph&&!isoMapping&&!isoColors.length)return;
   clearRun();
+  if(isoAnimation&&isoAnimation.frame) cancelAnimationFrame(isoAnimation.frame);
+  isoAnimation=null;
   isoFirstGraph=null;isoMapping=null;isoColors=[];
   if(isoGraph){
     isoGraph.nodes.forEach(node=>{if(node.color!=null)node.color=null;});
@@ -1267,8 +1334,68 @@ function setRun(r){
   stop(); run = r; stepIdx = 0; updatePlayer(); draw();
   toast(`พร้อมแล้ว ${r.steps.length} ขั้น — กด ▶ เพื่อเล่น หรือ ▶| ทีละขั้น`);
 }
-function clearRun(){ stop(); run = null; stepIdx = 0; updatePlayer(); }
-function go(i){ if(!run) return; stepIdx = clamp(i, 0, run.steps.length-1); updatePlayer(); draw(); }
+function resetPlanarityAnimation(restore=false){
+  if(!planarityAnimation)return;
+  if(planarityAnimation.frame)cancelAnimationFrame(planarityAnimation.frame);
+  if(restore){
+    const targets=planarityAnimation.targets;
+    G.nodes.forEach(node=>{const point=targets.get(String(node.id));if(point){node.x=point.x;node.y=point.y;}});
+    save();
+  }
+  planarityAnimation=null;
+}
+function preparePlanarityAnimation(layout){
+  resetPlanarityAnimation();
+  const points=G.nodes.map(node=>({id:String(node.id),point:layout[String(node.id)]})).filter(item=>Array.isArray(item.point)&&item.point.length===2);
+  if(!points.length)return;
+  const xs=points.map(item=>item.point[0]),ys=points.map(item=>item.point[1]);
+  const minX=Math.min(...xs),maxX=Math.max(...xs),minY=Math.min(...ys),maxY=Math.max(...ys);
+  const worldWidth=W/view.s,worldHeight=H/view.s,padding=64;
+  const scale=Math.min((worldWidth-2*padding)/Math.max(1,maxX-minX),(worldHeight-2*padding)/Math.max(1,maxY-minY));
+  const centerX=(W/2-view.x)/view.s,centerY=(H/2-view.y)/view.s;
+  const layoutCenterX=(minX+maxX)/2,layoutCenterY=(minY+maxY)/2;
+  planarityAnimation={frame:0,initial:new Map(),targets:new Map()};
+  G.nodes.forEach(node=>planarityAnimation.initial.set(String(node.id),{x:node.x,y:node.y}));
+  for(const item of points){
+    planarityAnimation.targets.set(item.id,{
+      x:centerX+(item.point[0]-layoutCenterX)*scale,
+      y:centerY+(item.point[1]-layoutCenterY)*scale
+    });
+  }
+}
+function planarityAnimationSteps(){
+  return [
+    {msg:'เริ่มต้น: แสดงกราฟในตำแหน่งปัจจุบัน'},
+    ...[25,50,75,100].map(percent=>({msg:`จัดตำแหน่งตาม planar embedding — ${percent}%`}))
+  ];
+}
+function animatePlanarityTo(index){
+  if(!planarityAnimation||!run||run.key!=='planarity')return;
+  if(planarityAnimation.frame)cancelAnimationFrame(planarityAnimation.frame);
+  const fraction=clamp(index/Math.max(1,run.steps.length-1),0,1),starts=new Map(),destinations=new Map();
+  G.nodes.forEach(node=>{
+    const id=String(node.id),initial=planarityAnimation.initial.get(id),target=planarityAnimation.targets.get(id);
+    if(initial&&target){
+      starts.set(id,{x:node.x,y:node.y});
+      destinations.set(id,{x:initial.x+(target.x-initial.x)*fraction,y:initial.y+(target.y-initial.y)*fraction});
+    }
+  });
+  const startTime=performance.now(),duration=500;
+  const frame=now=>{
+    if(!planarityAnimation)return;
+    const progress=clamp((now-startTime)/duration,0,1),eased=1-Math.pow(1-progress,3);
+    G.nodes.forEach(node=>{
+      const from=starts.get(String(node.id)),to=destinations.get(String(node.id));
+      if(from&&to){node.x=from.x+(to.x-from.x)*eased;node.y=from.y+(to.y-from.y)*eased;}
+    });
+    draw();
+    if(progress<1)planarityAnimation.frame=requestAnimationFrame(frame);
+    else{planarityAnimation.frame=0;if(fraction===1)save();}
+  };
+  planarityAnimation.frame=requestAnimationFrame(frame);
+}
+function clearRun(){ stop(); resetPlanarityAnimation(true); run = null; stepIdx = 0; updatePlayer(); }
+function go(i){ if(!run) return; stepIdx = clamp(i, 0, run.steps.length-1); if(run.key==='isomorphism') animateIsomorphismTo(stepIdx); if(run.key==='planarity') animatePlanarityTo(stepIdx); updatePlayer(); draw(); }
 function stop(){ playing = false; clearTimeout(timer); const b = $('#bPlay'); if(b) b.textContent = '▶'; }
 function play(){
   if(!run) return toast('กด "เริ่มรัน" ก่อน');
@@ -1326,7 +1453,7 @@ const TABS = {
 };
 const LEGENDS = {
   analyze:'',
-  dijkstra:'<span class="lg"><i style="background:#ffcd75"></i>กำลังปิดจุด</span><span class="lg"><i style="background:#ef7d57"></i>กำลัง Relax</span><span class="lg"><i style="background:#a7f070"></i>ปิดแล้ว</span><span class="lg"><i class="ln" style="background:#38b764"></i>เส้นทางสั้นสุด</span><span class="lg">🟨 ตัวเลขเหนือจุด = ระยะ</span>',
+  dijkstra:'<span class="lg"><i style="background:#d7263d"></i>จุดปัจจุบัน</span><span class="lg"><i style="background:#3a86ff"></i>จุดที่กำลัง Relax</span><span class="lg"><i class="ln" style="background:#ef7d57"></i>เส้นที่กำลังตรวจ</span><span class="lg"><i style="background:#2a9d8f"></i>ปิดแล้ว</span><span class="lg"><i class="ln" style="background:#38b764"></i>เส้นทางสั้นสุด</span><span class="lg">🟨 ตัวเลขเหนือจุด = ระยะ</span>',
   kruskal:'<span class="lg"><i class="ln" style="background:#38b764"></i>เส้นใน Spanning Tree/Forest</span><span class="lg"><i class="ln" style="background:#94b0c2"></i>ข้ามเพราะเกิดวงจร</span>',
   euler:'<span class="lg"><i class="ln" style="background:#38b764"></i>เส้นทาง Euler</span>',
   bipartite:'<span class="lg"><i style="background:#ef7d57"></i>ฝั่งที่ 1</span><span class="lg"><i style="background:#41a6f6"></i>ฝั่งที่ 2</span>',
@@ -1338,9 +1465,9 @@ const LEGENDS = {
   degreeSequence:'',
   complement:'',
   edgeColor:'<span class="lg">สีของเส้น = กลุ่มเส้นที่ไม่มีจุดร่วมกัน</span>',
-  prim:'<span class="lg"><i class="ln" style="background:#ef7d57"></i>เส้นตัวเลือก</span><span class="lg"><i class="ln" style="background:#38b764"></i>อยู่ในต้นไม้</span><span class="lg"><i style="background:#a7f070"></i>จุดในต้นไม้</span>',
+  prim:'<span class="lg"><i class="ln" style="background:#ef7d57"></i>เส้นตัวเลือก</span><span class="lg"><i class="ln" style="background:#38b764"></i>อยู่ในต้นไม้</span><span class="lg"><i style="background:#2a9d8f"></i>จุดในต้นไม้</span>',
   color:'<span class="lg"><i style="background:#fff;border-color:#b13e53;border-width:4px"></i>จุดที่กำลังพิจารณา</span><span class="lg"><i class="ln" style="background:#ef7d57"></i>เส้นขัดแย้ง</span><span class="lg">สีของจุด = กลุ่ม (ช่วงเวลา/ช่องเก็บ)</span>',
-  flow:'<span class="lg">ตัวเลข f/c = flow/ความจุ</span><span class="lg"><i class="ln" style="background:#3b5dc9"></i>มี flow</span><span class="lg"><i class="ln" style="background:#5d275d"></i>เต็ม</span><span class="lg"><i class="dash"></i>คอขวด (Min Cut)</span><span class="lg"><i style="background:#73eff7"></i>ฝั่ง S</span>'
+  flow:'<span class="lg">ตัวเลข f/c = flow/ความจุ</span><span class="lg"><i class="ln" style="background:#3b5dc9"></i>มี flow</span><span class="lg"><i class="ln" style="background:#5d275d"></i>เต็ม</span><span class="lg"><i class="dash"></i>คอขวด (Min Cut)</span><span class="lg"><i style="background:#8338ec"></i>ฝั่ง S</span>'
 };
 function setTab(key){
   algo = TABS[key] ? key : 'dijkstra'; const T = TABS[algo];

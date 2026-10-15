@@ -711,6 +711,8 @@ class PlanarityTests(unittest.TestCase):
             ],
         ))
         self.assertIs(result["planar"], True)
+        self.assertEqual(set(result["planarLayout"]), {"1", "2", "3", "4"})
+        self.assertTrue(all(len(point) == 2 for point in result["planarLayout"].values()))
 
     def test_planarity_finds_kuratowski_k5(self):
         result = run_algorithm(graph_payload(
