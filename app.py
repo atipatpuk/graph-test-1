@@ -14,6 +14,7 @@ Graph Theory Lab (Logistics & Urban Planning)
 """
 import http.server
 import json
+import os
 import socket
 import sys
 import threading
@@ -1924,7 +1925,7 @@ init();
 </html>
 """
 
-PORT_START = 8765
+PORT_START = int(os.environ.get("PORT", "8765"))
 
 
 def lan_ip() -> str:
@@ -2023,7 +2024,8 @@ def main():
 
     httpd = None
     port = PORT_START
-    for p in range(PORT_START, PORT_START + 40):
+    ports = [PORT_START] if "PORT" in os.environ else range(PORT_START, PORT_START + 40)
+    for p in ports:
         try:
             httpd = http.server.ThreadingHTTPServer(("0.0.0.0", p), Handler)
             port = p
@@ -2033,7 +2035,7 @@ def main():
 
     if httpd is None:
         print("เปิดเซิร์ฟเวอร์ไม่ได้ → เปิดไฟล์ HTML สำรอง (การรันอัลกอริทึมต้องใช้ Python server)")
-        if out:
+        if out and "PORT" not in os.environ:
             webbrowser.open(out.as_uri())
         return
 
@@ -2041,14 +2043,18 @@ def main():
     print("=" * 56)
     print("  GRAPH THEORY LAB  (Logistics & Urban Planning)")
     print("=" * 56)
-    print(f"  คอมพิวเตอร์นี้ : {url}")
-    print(f"  มือถือ/แท็บเล็ต : http://{lan_ip()}:{port}  (Wi-Fi เดียวกัน)")
-    if out:
+    if "PORT" in os.environ:
+      print(f"  Web service listening on assigned port {port}")
+    else:
+      print(f"  คอมพิวเตอร์นี้ : {url}")
+      print(f"  มือถือ/แท็บเล็ต : http://{lan_ip()}:{port}  (Wi-Fi เดียวกัน)")
+      if out:
         print(f"  ไฟล์ออฟไลน์    : {out}")
-    print("  กด Ctrl+C เพื่อปิดโปรแกรม")
+      print("  กด Ctrl+C เพื่อปิดโปรแกรม")
     print("=" * 56)
 
-    threading.Timer(0.7, lambda: webbrowser.open(url)).start()
+    if "PORT" not in os.environ:
+      threading.Timer(0.7, lambda: webbrowser.open(url)).start()
     try:
         httpd.serve_forever()
     except KeyboardInterrupt:
