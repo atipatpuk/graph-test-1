@@ -127,6 +127,9 @@ input[type=range]{flex:1;accent-color:var(--red);height:34px;min-width:120px}
 #stepLbl{font-size:13px;min-width:80px;text-align:right}
 .speed .btn{flex:1;font-size:14px}
 .stepbox{background:var(--ink);color:var(--green);border:3px solid #000;padding:10px 12px;min-height:72px;font-size:15px;line-height:1.55;box-shadow:inset 0 0 0 3px var(--navy);-webkit-user-select:text;user-select:text}
+@keyframes step-arrive{0%{transform:translateY(4px);opacity:.65}55%{transform:translateY(-1px)}100%{transform:translateY(0);opacity:1}}
+.stepbox.step-pop{animation:step-arrive .52s ease-out}
+@media (prefers-reduced-motion:reduce){.stepbox.step-pop{animation:none}}
 .legend{font-size:12px;display:flex;flex-wrap:wrap;gap:6px 12px;margin-top:6px}
 .lg{display:inline-flex;align-items:center;gap:5px}
 .lg i{display:inline-block;width:16px;height:16px;border:2px solid var(--ink)}
@@ -279,7 +282,7 @@ const EDGE_STY = {
   path:{c:'#38b764',w:8,hl:1}, reject:{c:'#94b0c2',w:3,dash:1}, cut:{c:'#b13e53',w:7,dash:1,hl:1},
   flow:{c:'#3b5dc9',w:5}, sat:{c:'#5d275d',w:6,hl:1}
 };
-const NR = 22, MINS = 0.2, MAXS = 4, EPS = 1e-9, LS_KEY = 'graphTheoryLab.v1', UNDO_MAX = 70;
+const NR = 22, PARALLEL_CURVE_GAP = 56, MINS = 0.2, MAXS = 4, EPS = 1e-9, LS_KEY = 'graphTheoryLab.v1', UNDO_MAX = 70;
 const IOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
 
 function emptyGraph(){ return {nodes:[], edges:[], directed:false, nextId:1, nextEid:1, source:null, sink:null, colorNames:[]}; }
@@ -290,6 +293,7 @@ let isoSplitView = false, isoPreviousView = null;
 let tool = 'move', selNode = null, isoSelNode = null, undoStack = [], redoStack = [], algo = 'dijkstra';
 let activeSide = 'left', lastActiveSide = 'left', sideContext = null;
 let run = null, stepIdx = 0, playing = false, timer = null, speed = 1;
+let stepFx = null;
 const pointers = new Map(); let drag = null, pinch = null, lastTap = {t:0, key:''};
 let hoverNode = null, hoverEdge = null, hoverStarted = 0, hoverFrame = 0;
 let edgePreview = null, isoEdgePreview = null;
@@ -439,7 +443,7 @@ function parallelEdgeCurves(graph){
   for(const group of groups.values()){
     if(group.length<2)continue;
     group.sort((a,b)=>a.id-b.id);
-    group.forEach((edge,index)=>curves.set(edge.id,(index-(group.length-1)/2)*28));
+    group.forEach((edge,index)=>curves.set(edge.id,(index-(group.length-1)/2)*PARALLEL_CURVE_GAP));
   }
   return curves;
 }
@@ -574,12 +578,16 @@ function drawEdge(c, e, st, showW, comparisonPanel=false, curveMap=null){
   const g = edgeGeom(e,curveMap); if(!g) return;
   const hovered = !comparisonPanel && hoverEdge === e.id, key = st && st.edge ? st.edge[e.id] : null;
   const S = EDGE_STY[key] || EDGE_STY.base;
+  const phase=key?stepFxPhase():0,pulse=key?Math.sin(Math.PI*phase):0;
   if(hovered){
     const wobble = Math.sin((performance.now()-hoverStarted)/75)*2.5;
     g.cx += g.nx*wobble; g.cy += g.ny*wobble; g.px += g.nx*wobble/2; g.py += g.ny*wobble/2;
   }
   const path = () => { c.beginPath(); c.moveTo(g.a.x,g.a.y); c.quadraticCurveTo(g.cx,g.cy,g.b.x,g.b.y); };
   c.save(); c.lineCap = 'round'; c.lineJoin = 'round';
+  if(pulse>0){
+    c.save(); c.globalAlpha=0.16+0.28*pulse; c.strokeStyle=S.c; c.lineWidth=S.w+10*pulse; c.shadowColor=S.c; c.shadowBlur=14*pulse; path(); c.stroke(); c.restore();
+  }
   if(S.hl){ c.setLineDash([]); c.strokeStyle = INK; c.lineWidth = S.w+4; path(); c.stroke(); }
   const edgeColor = !key && e.color != null ? PALETTE[e.color % PALETTE.length] : S.c;
   c.setLineDash(S.dash ? [12,8] : []); c.strokeStyle = hovered ? '#ef7d57' : edgeColor; c.lineWidth = S.w+(hovered?3:0); path(); c.stroke(); c.setLineDash([]);
@@ -596,16 +604,26 @@ function drawEdge(c, e, st, showW, comparisonPanel=false, curveMap=null){
   }
   const txt = st && st.etext ? st.etext[e.id] : (showW ? fmt(e.w) : null);
   if(txt != null) pill(c, g.px, g.py, txt, '#ffffff', INK, S.hl ? S.c : INK);
+  if(key==='consider'&&phase>0){
+    const spark=bez(g,0.12+0.76*phase);
+    c.save();c.fillStyle='#ffcd75';c.shadowColor='#ffcd75';c.shadowBlur=8;
+    c.fillRect(spark.x-4,spark.y-4,8,8);c.fillStyle='#ffffff';c.fillRect(spark.x-1,spark.y-1,2,2);c.restore();
+  }
   c.restore();
 }
 function drawNode(c, n, st, comparisonPanel=false){
   const hovered = !comparisonPanel && hoverNode === n.id;
+  const sty = st && st.node ? st.node[n.id] : null, r = NR;
+  const pulse=!comparisonPanel&&(sty==='current'||sty==='consider')?stepFxProgress():0;
+  if(hovered||pulse>0){
+    c.save();
+  }
   if(hovered){
     const phase = (performance.now()-hoverStarted)/75;
-    c.save(); c.translate(n.x,n.y); c.rotate(Math.sin(phase)*0.035);
+    c.translate(n.x,n.y); c.rotate(Math.sin(phase)*0.035);
     const scale = 1.04+Math.sin(phase*2)*0.025; c.scale(scale,scale); c.translate(-n.x,-n.y);
   }
-  const sty = st && st.node ? st.node[n.id] : null, r = NR;
+  if(pulse>0){c.translate(n.x,n.y-3*pulse);c.scale(1+0.07*pulse,1+0.07*pulse);c.translate(-n.x,-n.y);}
   let fill = '#8bea3c';
   if(st && st.fill){ if(st.fill[n.id] != null) fill = PALETTE[st.fill[n.id] % PALETTE.length]; }
   else if(!st && n.color != null) fill = PALETTE[n.color % PALETTE.length];
@@ -625,7 +643,14 @@ function drawNode(c, n, st, comparisonPanel=false){
   if(T && T.s && G.source === n.id) tag(c, n.x-r, n.y+r, 'S', '#38b764');
   if(T && T.t && G.sink === n.id) tag(c, n.x+r, n.y+r, 'T', '#b13e53');
   if(st && st.ntext && st.ntext[n.id] != null) pill(c, n.x, n.y-r-17, st.ntext[n.id], '#ffcd75', INK, INK);
-  if(hovered) c.restore();
+  if(pulse>0.12){
+    const sparkle=2+Math.round(pulse*2);
+    c.globalAlpha=0.45+0.45*pulse;c.fillStyle='#ffcd75';
+    c.fillRect(n.x-r-6,n.y-r-2,sparkle,sparkle);
+    c.fillRect(n.x+r+3,n.y+r-4,sparkle,sparkle);
+    c.fillStyle='#ffffff';c.fillRect(n.x+r+2,n.y-r-7,sparkle,sparkle);c.globalAlpha=1;
+  }
+  if(hovered||pulse>0)c.restore();
 }
 
 /* ---------- view ---------- */
@@ -822,15 +847,14 @@ function addEdge(u, v){
   toast(`🔗 สร้างเส้น ${nm(u)} ${G.directed?'→':'–'} ${nm(v)} = ${fmt(w)}`);
 }
 function storeEdge(u, v, w){
-  const parallel = G.edges.filter(x => G.directed
-    ? x.u === u && x.v === v
-    : (x.u === u && x.v === v) || (x.u === v && x.v === u));
-  const lanes = [0, 24, -24, 48, -48, 72, -72];
-  const e = {id:G.nextEid++, u, v, w, color:null, curve:parallel.length ? lanes[parallel.length % lanes.length] : 0};
-  if(u === v && parallel.length) e.curve = 18 * (parallel.length + 1);
-  const reverse = G.directed && G.edges.find(x => x.u === v && x.v === u && x.u !== x.v);
-  if(reverse){ e.curve = e.curve || 28; if(!reverse.curve) reverse.curve = 28; }
+  const e = {id:G.nextEid++, u, v, w, color:null, curve:0};
   G.edges.push(e);
+  const group=G.edges.filter(edge=>edge.u===u&&edge.v===v||edge.u===v&&edge.v===u).sort((a,b)=>a.id-b.id);
+  if(group.length<2)return;
+  group.forEach((edge,index)=>{
+    const canonicalCurve=(index-(group.length-1)/2)*PARALLEL_CURVE_GAP;
+    edge.curve=canonicalCurve*(edge.u<=edge.v?1:-1);
+  });
 }
 function renameNode(n){
   const s = prompt('ตั้งชื่อจุดยอด (เช่น คลังสินค้า, ร้านค้า 1, โรงพยาบาล):', n.label);
@@ -1330,8 +1354,33 @@ function runIsomorphismComparison(){
 }
 
 /* ---------- player ---------- */
+function stepFxPhase(){
+  if(!stepFx)return 0;
+  return clamp((performance.now()-stepFx.started)/800,0,1);
+}
+function stepFxProgress(){
+  return Math.sin(Math.PI*stepFxPhase());
+}
+function animateStepFx(){
+  if(stepFx&&stepFx.frame)cancelAnimationFrame(stepFx.frame);
+  if(window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches){stepFx=null;const stepText=$('#stepText');if(stepText)stepText.classList.remove('step-pop');return;}
+  const stepText=$('#stepText');
+  if(stepText){stepText.classList.remove('step-pop');void stepText.offsetWidth;stepText.classList.add('step-pop');}
+  const animation={started:performance.now(),frame:0};stepFx=animation;
+  const frame=now=>{
+    if(stepFx!==animation)return;
+    if(now-animation.started>=800){stepFx=null;draw();return;}
+    draw();animation.frame=requestAnimationFrame(frame);
+  };
+  animation.frame=requestAnimationFrame(frame);
+}
+function cancelStepFx(){
+  if(stepFx&&stepFx.frame)cancelAnimationFrame(stepFx.frame);
+  stepFx=null;
+  const stepText=$('#stepText');if(stepText)stepText.classList.remove('step-pop');
+}
 function setRun(r){
-  stop(); run = r; stepIdx = 0; updatePlayer(); draw();
+  stop(); run = r; stepIdx = 0; animateStepFx(); updatePlayer(); draw();
   toast(`พร้อมแล้ว ${r.steps.length} ขั้น — กด ▶ เพื่อเล่น หรือ ▶| ทีละขั้น`);
 }
 function resetPlanarityAnimation(restore=false){
@@ -1394,8 +1443,8 @@ function animatePlanarityTo(index){
   };
   planarityAnimation.frame=requestAnimationFrame(frame);
 }
-function clearRun(){ stop(); resetPlanarityAnimation(true); run = null; stepIdx = 0; updatePlayer(); }
-function go(i){ if(!run) return; stepIdx = clamp(i, 0, run.steps.length-1); if(run.key==='isomorphism') animateIsomorphismTo(stepIdx); if(run.key==='planarity') animatePlanarityTo(stepIdx); updatePlayer(); draw(); }
+function clearRun(){ stop(); cancelStepFx(); resetPlanarityAnimation(true); run = null; stepIdx = 0; updatePlayer(); }
+function go(i){ if(!run) return; stepIdx = clamp(i, 0, run.steps.length-1); if(run.key==='isomorphism') animateIsomorphismTo(stepIdx); if(run.key==='planarity') animatePlanarityTo(stepIdx); animateStepFx(); updatePlayer(); draw(); }
 function stop(){ playing = false; clearTimeout(timer); const b = $('#bPlay'); if(b) b.textContent = '▶'; }
 function play(){
   if(!run) return toast('กด "เริ่มรัน" ก่อน');
